@@ -1,0 +1,61 @@
+{
+  "dateRange": {
+    "start": "2026-01-05",
+    "end": "2026-06-04"
+  },
+  "rel": {
+    "dailyTarget": 20,
+    "dateStart": "2026-01-05",
+    "dateEnd": "2026-06-04"
+  },
+  "other": {
+    "label": "PRB",
+    "selectedPhase": "PRB",
+    "dateStart": "2026-01-05",
+    "dateEnd": "2026-06-04",
+    "targets": {
+      "M": 200,
+      "E": 200
+    }
+  },
+  "phaseTargets": {},
+  "refresh": {
+    "intervalMinutes": 60,
+    "slideDwellSeconds": 15
+  },
+  "counting": {
+    "dedupeBySn": false
+  },
+  "incremental": {
+    "enabled": true,
+    "frozenThrough": "2026-06-04",
+    "fetchDays": 3
+  },
+  "phaseOnly": {
+    "M03-CQA-Humdity test": {
+      "M": 100,
+      "E": 100
+    },
+    "M03-EQT-Constant Temp Room": {
+      "M": 20,
+      "E": 20
+    },
+    "M03-EQT-Beach": {
+      "M": 12,
+      "E": 12
+    },
+    "M03-EQT-Other": {
+      "M": 28,
+      "E": 28
+    }
+  },
+  "relOnly": {
+    "M03-EQT-Charge-Discharge": {
+      "M": 10,
+      "E": 10,
+      "enabled": false,
+      "weekly": true,
+      "enabledSince": null
+    }
+  }
+}

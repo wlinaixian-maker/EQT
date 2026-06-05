@@ -1,0 +1,160 @@
+{
+  "_comment": "非 REL 工单：各工站各型号一次性固定目标数量（可修改）。未配置时默认=当前实际过站数（显示100%）",
+  "dateRange": {
+    "start": "2026-01-05",
+    "end": "2026-06-04"
+  },
+  "relDailyTarget": 20,
+  "defaultNonRelTarget": null,
+  "stations": {
+    "M03-CQA-Humdity test": {
+      "nonRel": {
+        "BM": 50,
+        "BL": 50,
+        "BP": 50,
+        "BN": 50
+      }
+    },
+    "M03-EQT-Basketball-Football": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-CHECK-IN": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-CHECK-OUT": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-Coffee-Convenience Store": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-Commute": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-Gym": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-Home": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-Noise Room": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-Office": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-Quiet Room": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-Running Track": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-Stairs": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-Test": {
+      "nonRel": {
+        "BM": 100,
+        "BL": 100,
+        "BP": 100,
+        "BN": 100
+      }
+    },
+    "M03-EQT-Charge-Discharge": {
+      "rel": {
+        "BM": 5,
+        "BL": 5,
+        "BP": 5,
+        "BN": 5
+      }
+    },
+    "M03-EQT-Constant Temp Room": {
+      "nonRel": {
+        "BM": 10,
+        "BL": 10,
+        "BP": 10,
+        "BN": 10
+      }
+    },
+    "M03-EQT-Beach": {
+      "nonRel": {
+        "BM": 6,
+        "BL": 6,
+        "BP": 6,
+        "BN": 6
+      }
+    },
+    "M03-EQT-Other": {
+      "nonRel": {
+        "BM": 14,
+        "BL": 14,
+        "BP": 14,
+        "BN": 14
+      }
+    }
+  },
+  "_dashboardOther": {
+    "label": "PRB",
+    "dateStart": "2026-01-05",
+    "dateEnd": "2026-06-04"
+  }
+}

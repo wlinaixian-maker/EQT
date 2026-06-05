@@ -1,0 +1,2420 @@
+{
+  "generatedAt": "2026-06-05 16:49:58",
+  "variantLabels": {
+    "BM": "M·BM",
+    "BL": "M·BL",
+    "BP": "E·BP",
+    "BN": "E·BN"
+  },
+  "rules": {
+    "rel": "工单含 REL：型号 = SN 末两位 (BM/BL→M，BP/BN→E)",
+    "nonRel": "工单不含 REL：按 DVT/EVT/PVT/PPVT/PRB/P1/OVB 分阶段；型号 = MAIN/MINI-(M|E)-FATP-(L|R)",
+    "relTarget": "全工站 REL 目标 = CHECK-IN 累计：BM167 BL159 BP151 BN157，M326+E308=634",
+    "nonRelTarget": "各工站一次性固定目标，见 station_targets.json"
+  },
+  "dateRange": {
+    "start": "2026-01-05",
+    "end": "2026-06-04"
+  },
+  "relDailyTarget": 20,
+  "relDailyTargetNote": "per_side_me",
+  "relPeriodTotal": 634,
+  "relActiveDays": 19,
+  "relActiveDates": [
+    "2026-05-04",
+    "2026-05-05",
+    "2026-05-06",
+    "2026-05-07",
+    "2026-05-08",
+    "2026-05-09",
+    "2026-05-11",
+    "2026-05-12",
+    "2026-05-13",
+    "2026-05-14",
+    "2026-05-15",
+    "2026-05-16",
+    "2026-05-19",
+    "2026-05-20",
+    "2026-05-21",
+    "2026-05-23",
+    "2026-05-25",
+    "2026-06-01",
+    "2026-06-02"
+  ],
+  "relMActiveDays": 14,
+  "relEActiveDays": 16,
+  "relMTarget": 326,
+  "relETarget": 308,
+  "checkinRelDaily": [
+    {
+      "date": "2026-05-04",
+      "m": 30,
+      "e": 0,
+      "mTarget": 20,
+      "eTarget": 0,
+      "variants": {
+        "BM": 15,
+        "BL": 15,
+        "BP": 0,
+        "BN": 0
+      }
+    },
+    {
+      "date": "2026-05-05",
+      "m": 20,
+      "e": 10,
+      "mTarget": 20,
+      "eTarget": 20,
+      "variants": {
+        "BM": 10,
+        "BL": 10,
+        "BP": 5,
+        "BN": 5
+      }
+    },
+    {
+      "date": "2026-05-06",
+      "m": 0,
+      "e": 34,
+      "mTarget": 0,
+      "eTarget": 20,
+      "variants": {
+        "BM": 0,
+        "BL": 0,
+        "BP": 17,
+        "BN": 17
+      }
+    },
+    {
+      "date": "2026-05-07",
+      "m": 21,
+      "e": 9,
+      "mTarget": 20,
+      "eTarget": 20,
+      "variants": {
+        "BM": 10,
+        "BL": 11,
+        "BP": 4,
+        "BN": 5
+      }
+    },
+    {
+      "date": "2026-05-08",
+      "m": 43,
+      "e": 2,
+      "mTarget": 20,
+      "eTarget": 20,
+      "variants": {
+        "BM": 22,
+        "BL": 21,
+        "BP": 2,
+        "BN": 0
+      }
+    },
+    {
+      "date": "2026-05-09",
+      "m": 20,
+      "e": 18,
+      "mTarget": 20,
+      "eTarget": 20,
+      "variants": {
+        "BM": 10,
+        "BL": 10,
+        "BP": 8,
+        "BN": 10
+      }
+    },
+    {
+      "date": "2026-05-11",
+      "m": 0,
+      "e": 40,
+      "mTarget": 0,
+      "eTarget": 20,
+      "variants": {
+        "BM": 0,
+        "BL": 0,
+        "BP": 20,
+        "BN": 20
+      }
+    },
+    {
+      "date": "2026-05-12",
+      "m": 20,
+      "e": 22,
+      "mTarget": 20,
+      "eTarget": 20,
+      "variants": {
+        "BM": 10,
+        "BL": 10,
+        "BP": 13,
+        "BN": 9
+      }
+    },
+    {
+      "date": "2026-05-13",
+      "m": 0,
+      "e": 40,
+      "mTarget": 0,
+      "eTarget": 20,
+      "variants": {
+        "BM": 0,
+        "BL": 0,
+        "BP": 20,
+        "BN": 20
+      }
+    },
+    {
+      "date": "2026-05-14",
+      "m": 43,
+      "e": 0,
+      "mTarget": 20,
+      "eTarget": 0,
+      "variants": {
+        "BM": 21,
+        "BL": 22,
+        "BP": 0,
+        "BN": 0
+      }
+    },
+    {
+      "date": "2026-05-15",
+      "m": 20,
+      "e": 20,
+      "mTarget": 20,
+      "eTarget": 20,
+      "variants": {
+        "BM": 10,
+        "BL": 10,
+        "BP": 10,
+        "BN": 10
+      }
+    },
+    {
+      "date": "2026-05-16",
+      "m": 10,
+      "e": 36,
+      "mTarget": 20,
+      "eTarget": 20,
+      "variants": {
+        "BM": 3,
+        "BL": 7,
+        "BP": 20,
+        "BN": 16
+      }
+    },
+    {
+      "date": "2026-05-19",
+      "m": 14,
+      "e": 7,
+      "mTarget": 20,
+      "eTarget": 20,
+      "variants": {
+        "BM": 7,
+        "BL": 7,
+        "BP": 4,
+        "BN": 3
+      }
+    },
+    {
+      "date": "2026-05-20",
+      "m": 16,
+      "e": 4,
+      "mTarget": 20,
+      "eTarget": 20,
+      "variants": {
+        "BM": 10,
+        "BL": 6,
+        "BP": 0,
+        "BN": 4
+      }
+    },
+    {
+      "date": "2026-05-21",
+      "m": 13,
+      "e": 10,
+      "mTarget": 20,
+      "eTarget": 20,
+      "variants": {
+        "BM": 11,
+        "BL": 2,
+        "BP": 0,
+        "BN": 10
+      }
+    },
+    {
+      "date": "2026-05-23",
+      "m": 40,
+      "e": 0,
+      "mTarget": 20,
+      "eTarget": 0,
+      "variants": {
+        "BM": 20,
+        "BL": 20,
+        "BP": 0,
+        "BN": 0
+      }
+    },
+    {
+      "date": "2026-05-25",
+      "m": 0,
+      "e": 20,
+      "mTarget": 0,
+      "eTarget": 20,
+      "variants": {
+        "BM": 0,
+        "BL": 0,
+        "BP": 10,
+        "BN": 10
+      }
+    },
+    {
+      "date": "2026-06-01",
+      "m": 0,
+      "e": 20,
+      "mTarget": 0,
+      "eTarget": 20,
+      "variants": {
+        "BM": 0,
+        "BL": 0,
+        "BP": 10,
+        "BN": 10
+      }
+    },
+    {
+      "date": "2026-06-02",
+      "m": 16,
+      "e": 16,
+      "mTarget": 20,
+      "eTarget": 20,
+      "variants": {
+        "BM": 8,
+        "BL": 8,
+        "BP": 8,
+        "BN": 8
+      }
+    }
+  ],
+  "stations": [
+    {
+      "name": "CHECK-IN",
+      "stationId": "M03-EQT-CHECK-IN",
+      "mode": "both",
+      "file": "M03-EQT-CHECK-IN.xlsx",
+      "totalPass": 2124,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 167,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 326,
+            "sideTarget": 326,
+            "completionPct": 100.0,
+            "sideCompletionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 159,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 326,
+            "sideTarget": 326,
+            "completionPct": 100.0,
+            "sideCompletionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 151,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 308,
+            "sideTarget": 308,
+            "completionPct": 100.0,
+            "sideCompletionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 157,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 308,
+            "sideTarget": 308,
+            "completionPct": 100.0,
+            "sideCompletionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 634,
+          "fail": 0,
+          "target": 634,
+          "mActual": 326,
+          "mTarget": 326,
+          "eActual": 308,
+          "eTarget": 308,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 350,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 340,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 393,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 381,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1464,
+          "fail": 0,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Basketball-Football",
+      "stationId": "M03-EQT-Basketball-Football",
+      "mode": "both",
+      "file": "M03-EQT-Basketball-Football.xlsx",
+      "totalPass": 2109,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 164,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.2,
+            "sideCompletionPct": 98.16
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 156,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.11,
+            "sideCompletionPct": 98.16
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 149,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 98.68,
+            "sideCompletionPct": 98.05
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 153,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 97.45,
+            "sideCompletionPct": 98.05
+          }
+        },
+        "summary": {
+          "actual": 622,
+          "fail": 0,
+          "target": 634,
+          "mActual": 320,
+          "mTarget": 326,
+          "eActual": 302,
+          "eTarget": 308,
+          "completionPct": 98.11,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 341,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 332,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 393,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 381,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1447,
+          "fail": 0,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Coffee-Store",
+      "stationId": "M03-EQT-Coffee-Convenience Store",
+      "mode": "both",
+      "file": "M03-EQT-Coffee-Convenience_Store.xlsx",
+      "totalPass": 2101,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 164,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.2,
+            "sideCompletionPct": 98.16
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 156,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.11,
+            "sideCompletionPct": 98.16
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 149,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 98.68,
+            "sideCompletionPct": 98.05
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 153,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 97.45,
+            "sideCompletionPct": 98.05
+          }
+        },
+        "summary": {
+          "actual": 622,
+          "fail": 0,
+          "target": 634,
+          "mActual": 320,
+          "mTarget": 326,
+          "eActual": 302,
+          "eTarget": 308,
+          "completionPct": 98.11,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 338,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 329,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 392,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 380,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1439,
+          "fail": 0,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Commute",
+      "stationId": "M03-EQT-Commute",
+      "mode": "both",
+      "file": "M03-EQT-Commute.xlsx",
+      "totalPass": 2103,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 164,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.2,
+            "sideCompletionPct": 98.16
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 156,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.11,
+            "sideCompletionPct": 98.16
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 149,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 98.68,
+            "sideCompletionPct": 98.05
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 153,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 97.45,
+            "sideCompletionPct": 98.05
+          }
+        },
+        "summary": {
+          "actual": 622,
+          "fail": 0,
+          "target": 634,
+          "mActual": 320,
+          "mTarget": 326,
+          "eActual": 302,
+          "eTarget": 308,
+          "completionPct": 98.11,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 339,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 330,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 393,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 381,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1443,
+          "fail": 0,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Gym",
+      "stationId": "M03-EQT-Gym",
+      "mode": "both",
+      "file": "M03-EQT-Gym.xlsx",
+      "totalPass": 2108,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 164,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 319,
+            "sideTarget": 326,
+            "completionPct": 98.2,
+            "sideCompletionPct": 97.85
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 155,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 319,
+            "sideTarget": 326,
+            "completionPct": 97.48,
+            "sideCompletionPct": 97.85
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 149,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 98.68,
+            "sideCompletionPct": 98.05
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 153,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 97.45,
+            "sideCompletionPct": 98.05
+          }
+        },
+        "summary": {
+          "actual": 621,
+          "fail": 0,
+          "target": 634,
+          "mActual": 319,
+          "mTarget": 326,
+          "eActual": 302,
+          "eTarget": 308,
+          "completionPct": 97.95,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 341,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 332,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 393,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 381,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1447,
+          "fail": 0,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Home",
+      "stationId": "M03-EQT-Home",
+      "mode": "both",
+      "file": "M03-EQT-Home.xlsx",
+      "totalPass": 2106,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 164,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 319,
+            "sideTarget": 326,
+            "completionPct": 98.2,
+            "sideCompletionPct": 97.85
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 155,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 319,
+            "sideTarget": 326,
+            "completionPct": 97.48,
+            "sideCompletionPct": 97.85
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 149,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 303,
+            "sideTarget": 308,
+            "completionPct": 98.68,
+            "sideCompletionPct": 98.38
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 154,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 303,
+            "sideTarget": 308,
+            "completionPct": 98.09,
+            "sideCompletionPct": 98.38
+          }
+        },
+        "summary": {
+          "actual": 622,
+          "fail": 0,
+          "target": 634,
+          "mActual": 319,
+          "mTarget": 326,
+          "eActual": 303,
+          "eTarget": 308,
+          "completionPct": 98.11,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 340,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 330,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 393,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 381,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1444,
+          "fail": 0,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Office",
+      "stationId": "M03-EQT-Office",
+      "mode": "both",
+      "file": "M03-EQT-Office.xlsx",
+      "totalPass": 2104,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 164,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.2,
+            "sideCompletionPct": 98.16
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 156,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.11,
+            "sideCompletionPct": 98.16
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 149,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 98.68,
+            "sideCompletionPct": 98.05
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 153,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 97.45,
+            "sideCompletionPct": 98.05
+          }
+        },
+        "summary": {
+          "actual": 622,
+          "fail": 0,
+          "target": 634,
+          "mActual": 320,
+          "mTarget": 326,
+          "eActual": 302,
+          "eTarget": 308,
+          "completionPct": 98.11,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 340,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 332,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 393,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 381,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1446,
+          "fail": 0,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Quiet Room",
+      "stationId": "M03-EQT-Quiet Room",
+      "mode": "both",
+      "file": "M03-EQT-Quiet_Room.xlsx",
+      "totalPass": 2102,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 164,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 319,
+            "sideTarget": 326,
+            "completionPct": 98.2,
+            "sideCompletionPct": 97.85
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 155,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 319,
+            "sideTarget": 326,
+            "completionPct": 97.48,
+            "sideCompletionPct": 97.85
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 149,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 98.68,
+            "sideCompletionPct": 98.05
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 153,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 97.45,
+            "sideCompletionPct": 98.05
+          }
+        },
+        "summary": {
+          "actual": 621,
+          "fail": 0,
+          "target": 634,
+          "mActual": 319,
+          "mTarget": 326,
+          "eActual": 302,
+          "eTarget": 308,
+          "completionPct": 97.95,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 340,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 331,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 393,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 381,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1445,
+          "fail": 0,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Running Track",
+      "stationId": "M03-EQT-Running Track",
+      "mode": "both",
+      "file": "M03-EQT-Running_Track.xlsx",
+      "totalPass": 2109,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 164,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.2,
+            "sideCompletionPct": 98.16
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 156,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.11,
+            "sideCompletionPct": 98.16
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 149,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 98.68,
+            "sideCompletionPct": 98.05
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 153,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 97.45,
+            "sideCompletionPct": 98.05
+          }
+        },
+        "summary": {
+          "actual": 622,
+          "fail": 0,
+          "target": 634,
+          "mActual": 320,
+          "mTarget": 326,
+          "eActual": 302,
+          "eTarget": 308,
+          "completionPct": 98.11,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 341,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 332,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 393,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 381,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1447,
+          "fail": 0,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Stairs",
+      "stationId": "M03-EQT-Stairs",
+      "mode": "both",
+      "file": "M03-EQT-Stairs.xlsx",
+      "totalPass": 2107,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 164,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.2,
+            "sideCompletionPct": 98.16
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 156,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.11,
+            "sideCompletionPct": 98.16
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 149,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 98.68,
+            "sideCompletionPct": 98.05
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 153,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 97.45,
+            "sideCompletionPct": 98.05
+          }
+        },
+        "summary": {
+          "actual": 622,
+          "fail": 0,
+          "target": 634,
+          "mActual": 320,
+          "mTarget": 326,
+          "eActual": 302,
+          "eTarget": 308,
+          "completionPct": 98.11,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 341,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 332,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 393,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 381,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1447,
+          "fail": 0,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Noise Room",
+      "stationId": "M03-EQT-Noise Room",
+      "mode": "both",
+      "file": "M03-EQT-Noise_Room.xlsx",
+      "totalPass": 2105,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 164,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.2,
+            "sideCompletionPct": 98.16
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 156,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 320,
+            "sideTarget": 326,
+            "completionPct": 98.11,
+            "sideCompletionPct": 98.16
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 149,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 98.68,
+            "sideCompletionPct": 98.05
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 153,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 97.45,
+            "sideCompletionPct": 98.05
+          }
+        },
+        "summary": {
+          "actual": 622,
+          "fail": 0,
+          "target": 634,
+          "mActual": 320,
+          "mTarget": 326,
+          "eActual": 302,
+          "eTarget": 308,
+          "completionPct": 98.11,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 339,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 330,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 393,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 381,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1443,
+          "fail": 0,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Test",
+      "stationId": "M03-EQT-Test",
+      "mode": "both",
+      "file": "M03-EQT-Test.xlsx",
+      "totalPass": 2054,
+      "totalFail": 1,
+      "yieldPct": 99.95,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 164,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 319,
+            "sideTarget": 326,
+            "completionPct": 98.2,
+            "sideCompletionPct": 97.85
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 155,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 319,
+            "sideTarget": 326,
+            "completionPct": 97.48,
+            "sideCompletionPct": 97.85
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 149,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 98.68,
+            "sideCompletionPct": 98.05
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 153,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 97.45,
+            "sideCompletionPct": 98.05
+          }
+        },
+        "summary": {
+          "actual": 621,
+          "fail": 0,
+          "target": 634,
+          "mActual": 319,
+          "mTarget": 326,
+          "eActual": 302,
+          "eTarget": 308,
+          "completionPct": 97.95,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 328,
+            "fail": 1,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 320,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 381,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 372,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1401,
+          "fail": 1,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 99.93
+        },
+        "yieldPct": 99.93
+      }
+    },
+    {
+      "name": "CHECK-OUT",
+      "stationId": "M03-EQT-CHECK-OUT",
+      "mode": "both",
+      "file": "M03-EQT-CHECK-OUT.xlsx",
+      "totalPass": 2052,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 100.0,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 164,
+            "fail": 0,
+            "target": 167,
+            "side": "M",
+            "sideActual": 319,
+            "sideTarget": 326,
+            "completionPct": 98.2,
+            "sideCompletionPct": 97.85
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 155,
+            "fail": 0,
+            "target": 159,
+            "side": "M",
+            "sideActual": 319,
+            "sideTarget": 326,
+            "completionPct": 97.48,
+            "sideCompletionPct": 97.85
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 149,
+            "fail": 0,
+            "target": 151,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 98.68,
+            "sideCompletionPct": 98.05
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 153,
+            "fail": 0,
+            "target": 157,
+            "side": "E",
+            "sideActual": 302,
+            "sideTarget": 308,
+            "completionPct": 97.45,
+            "sideCompletionPct": 98.05
+          }
+        },
+        "summary": {
+          "actual": 621,
+          "fail": 0,
+          "target": 634,
+          "mActual": 319,
+          "mTarget": 326,
+          "eActual": 302,
+          "eTarget": 308,
+          "completionPct": 97.95,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 326,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 320,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 381,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 372,
+            "fail": 0,
+            "target": 100,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 1399,
+          "fail": 0,
+          "target": 400,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Charge-Discharge",
+      "stationId": "M03-EQT-Charge-Discharge",
+      "mode": "rel_only",
+      "file": "M03-EQT-Charge-Discharge.xlsx",
+      "totalPass": 3,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 0.38,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 0,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 0.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 0,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 0.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 0,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 0.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 0,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 0.0
+          }
+        },
+        "summary": {
+          "actual": 0,
+          "fail": 0,
+          "target": 800,
+          "completionPct": 0.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 0,
+          "fail": 0,
+          "target": 0,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Humdity Test",
+      "stationId": "M03-CQA-Humdity test",
+      "mode": "phase_only",
+      "file": "M03-CQA-Humdity_test.xlsx",
+      "totalPass": 533,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 66.62,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 0,
+          "fail": 0,
+          "target": 0,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 134,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 67.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 125,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 62.5
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 133,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 66.5
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 133,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 66.5
+          }
+        },
+        "summary": {
+          "actual": 525,
+          "fail": 0,
+          "target": 800,
+          "completionPct": 65.62,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Constant Temp Room",
+      "stationId": "M03-EQT-Constant Temp Room",
+      "mode": "phase_only",
+      "file": "M03-EQT-Constant_Temp_Room.xlsx",
+      "totalPass": 42,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 5.25,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 0,
+          "fail": 0,
+          "target": 0,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 15,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 7.5
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 10,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 5.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 7,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 3.5
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 10,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 5.0
+          }
+        },
+        "summary": {
+          "actual": 42,
+          "fail": 0,
+          "target": 800,
+          "completionPct": 5.25,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Beach",
+      "stationId": "M03-EQT-Beach",
+      "mode": "phase_only",
+      "file": "M03-EQT-Beach.xlsx",
+      "totalPass": 28,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 3.5,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 0,
+          "fail": 0,
+          "target": 0,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 10,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 5.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 6,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 3.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 6,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 3.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 6,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 3.0
+          }
+        },
+        "summary": {
+          "actual": 28,
+          "fail": 0,
+          "target": 800,
+          "completionPct": 3.5,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    },
+    {
+      "name": "Other",
+      "stationId": "M03-EQT-Other",
+      "mode": "phase_only",
+      "file": "M03-EQT-Other.xlsx",
+      "totalPass": 59,
+      "totalFail": 0,
+      "yieldPct": 100.0,
+      "completionPct": 7.38,
+      "dateRange": {
+        "start": "2026-01-05",
+        "end": "2026-06-04",
+        "days": 19
+      },
+      "rel": {
+        "dailyTarget": 20,
+        "cumulativeDays": 19,
+        "activeDaysSource": "CHECK-IN",
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 0,
+            "fail": 0,
+            "target": 0,
+            "completionPct": 100.0
+          }
+        },
+        "summary": {
+          "actual": 0,
+          "fail": 0,
+          "target": 0,
+          "completionPct": 100.0,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      },
+      "nonRel": {
+        "variants": {
+          "BM": {
+            "label": "M·BM",
+            "actual": 17,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 8.5
+          },
+          "BL": {
+            "label": "M·BL",
+            "actual": 14,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 7.0
+          },
+          "BP": {
+            "label": "E·BP",
+            "actual": 14,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 7.0
+          },
+          "BN": {
+            "label": "E·BN",
+            "actual": 14,
+            "fail": 0,
+            "target": 200,
+            "completionPct": 7.0
+          }
+        },
+        "summary": {
+          "actual": 59,
+          "fail": 0,
+          "target": 800,
+          "completionPct": 7.38,
+          "yieldPct": 100.0
+        },
+        "yieldPct": 100.0
+      }
+    }
+  ],
+  "global": {
+    "rel": {
+      "BM": {
+        "label": "M·BM",
+        "actual": 2135,
+        "fail": 0,
+        "target": 167,
+        "side": "M",
+        "sideActual": 4161,
+        "sideTarget": 326,
+        "completionPct": 100.0,
+        "sideCompletionPct": 100.0
+      },
+      "BL": {
+        "label": "M·BL",
+        "actual": 2026,
+        "fail": 0,
+        "target": 159,
+        "side": "M",
+        "sideActual": 4161,
+        "sideTarget": 326,
+        "completionPct": 100.0,
+        "sideCompletionPct": 100.0
+      },
+      "BP": {
+        "label": "E·BP",
+        "actual": 1939,
+        "fail": 0,
+        "target": 151,
+        "side": "E",
+        "sideActual": 3933,
+        "sideTarget": 308,
+        "completionPct": 100.0,
+        "sideCompletionPct": 100.0
+      },
+      "BN": {
+        "label": "E·BN",
+        "actual": 1994,
+        "fail": 0,
+        "target": 157,
+        "side": "E",
+        "sideActual": 3933,
+        "sideTarget": 308,
+        "completionPct": 100.0,
+        "sideCompletionPct": 100.0
+      },
+      "_summary": {
+        "actual": 8094,
+        "fail": 0,
+        "target": 634,
+        "mActual": 4161,
+        "mTarget": 326,
+        "eActual": 3933,
+        "eTarget": 308,
+        "completionPct": 100.0,
+        "yieldPct": 100.0
+      }
+    },
+    "nonRel": {
+      "BM": {
+        "label": "M·BM",
+        "actual": 4580,
+        "fail": 1,
+        "target": 2100,
+        "completionPct": 100.0
+      },
+      "BL": {
+        "label": "M·BL",
+        "actual": 4445,
+        "fail": 0,
+        "target": 2100,
+        "completionPct": 100.0
+      },
+      "BP": {
+        "label": "E·BP",
+        "actual": 5244,
+        "fail": 0,
+        "target": 2100,
+        "completionPct": 100.0
+      },
+      "BN": {
+        "label": "E·BN",
+        "actual": 5097,
+        "fail": 0,
+        "target": 2100,
+        "completionPct": 100.0
+      },
+      "_summary": {
+        "actual": 19366,
+        "fail": 1,
+        "target": 8400,
+        "completionPct": 100.0,
+        "yieldPct": 99.99
+      }
+    },
+    "totalCompletionPct": 100.0
+  }
+}

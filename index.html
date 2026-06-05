@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EQT Test Progress Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --panel-hover: #f1f5f9;
+            --border: #e2e8f0;
+            --rel-color: #0284c7;
+            --rel-light: #e0f2fe;
+            --non-rel-color: #059669;
+            --non-rel-light: #d1fae5;
+            --success: #059669;
+            --danger: #dc2626;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --progress-cycle: 3.2s;
+            --slide-duration: 1.4s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .num-font {
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: 'tnum' 1;
+        }
+        html, body {
+            height: 100%; overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: var(--text-main);
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(ellipse 70% 45% at 12% -5%, rgba(2, 132, 199, 0.07), transparent 55%),
+                radial-gradient(ellipse 55% 40% at 92% 105%, rgba(5, 150, 105, 0.06), transparent 50%);
+        }
+        
+        body { padding: 18px 28px; display: flex; flex-direction: column; gap: 14px; }
+
+        .header {
+            position: relative;
+            display: flex; justify-content: center; align-items: center; flex-shrink: 0;
+            padding-bottom: 14px;
+        }
+        .header::after {
+            content: '';
+            position: absolute; bottom: 0; left: 8%; right: 8%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+        }
+        .header-title { text-align: center; }
+        .header h1 {
+            font-size: 32px; font-weight: 700; letter-spacing: -0.6px;
+            background: linear-gradient(135deg, #0f172a 20%, #475569 100%);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .live-status {
+            position: absolute; left: 0;
+            display: flex; align-items: center; gap: 8px; padding: 7px 14px;
+            background: #ecfdf5; border: 1px solid #a7f3d0;
+            border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--success);
+            text-transform: uppercase; letter-spacing: 0.06em;
+        }
+        .live-status::before {
+            content: ''; width: 7px; height: 7px; background: var(--success); border-radius: 50%;
+            box-shadow: 0 0 8px rgba(5, 150, 105, 0.5); animation: breathe 2s infinite ease-in-out;
+        }
+        @keyframes breathe { 0%, 100% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.2); } }
+
+        .controls { position: absolute; right: 0; display: flex; gap: 8px; pointer-events: auto; }
+        
+        .viewport {
+            flex: 1; min-height: 0; overflow: hidden; position: relative; cursor: grab;
+        }
+        .viewport:active { cursor: grabbing; }
+
+        .slider-track {
+            display: flex; width: 300%; height: 100%;
+            transition: transform var(--slide-duration) cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+        .slide-page {
+            width: 33.333333%; height: 100%; padding: 0 8px;
+            display: flex; flex-direction: column; gap: 12px;
+            user-select: none; -webkit-user-select: none;
+        }
+        
+        .page-title { 
+            justify-content: center;
+            font-size: 22px; font-weight: 700; letter-spacing: 0.06em;
+            display: flex; align-items: center; gap: 10px; 
+            margin-bottom: 4px; position: relative; padding-bottom: 10px;
+        }
+        .page-title.rel { color: var(--rel-color); }
+        .page-title.rel::after {
+            content: '';
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 140px; height: 2px; border-radius: 2px;
+            background: linear-gradient(90deg, transparent, var(--rel-color), transparent);
+            opacity: 0.55;
+        }
+        .page-title.nonrel { color: var(--non-rel-color); }
+
+        .grid-split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1; min-height: 0; pointer-events: none; }
+        .table-container {
+            background: var(--panel);
+            border: 1px solid var(--border); border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+            overflow: hidden; display: flex; flex-direction: column;
+        }
+        .slide-page.slide-rel .table-container {
+            border-top: 3px solid var(--rel-color);
+        }
+        .slide-page.slide-nonrel .table-container {
+            border-top: 3px solid var(--non-rel-color);
+        }
+
+        table.dashboard-matrix { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; height: 100%; letter-spacing: -0.01em; }
+        table.dashboard-matrix th { 
+            padding: 13px 8px; text-align: center; font-weight: 700; font-size: 10.5px;
+            text-transform: uppercase; letter-spacing: 0.09em; color: #94a3b8;
+            border-bottom: 1.5px solid #cbd5e1;
+            background: #f8fafc;
+        }
+        table.dashboard-matrix td { 
+            padding: 6px 12px; text-align: center;
+            border-bottom: 1px solid #cbd5e1; vertical-align: middle; 
+        }
+        table.dashboard-matrix tbody tr {
+            transition: background 0.18s ease, box-shadow 0.18s ease;
+            height: 11.11%;
+        }
+        table.dashboard-matrix tbody tr:nth-child(even) { background: #f8fafc; }
+        table.dashboard-matrix tbody tr:hover { background: #f1f5f9; }
+        table.dashboard-matrix tbody tr:last-child td { border-bottom: 1px solid #cbd5e1; }
+        
+        table.dashboard-matrix td.col-station-name {
+            width: 30%;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #1e293b;
+            padding: 6px 20px;
+            text-align: center;
+            border-right: 1px solid #cbd5e1;
+            border-left: 3px solid transparent;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .slide-page.slide-rel table.dashboard-matrix tbody tr:hover td.col-station-name {
+            border-left-color: var(--rel-color);
+            background: linear-gradient(90deg, rgba(224, 242, 254, 0.55) 0%, transparent 55%);
+        }
+        .slide-page.slide-nonrel table.dashboard-matrix tbody tr:hover td.col-station-name {
+            border-left-color: var(--non-rel-color);
+            background: linear-gradient(90deg, rgba(209, 250, 229, 0.5) 0%, transparent 55%);
+        }
+        table.dashboard-matrix th.col-station-head { border-right: 1px solid #cbd5e1; }
+        table.dashboard-matrix th.col-sku-e,
+        table.dashboard-matrix td.col-sku-e { border-left: 1px solid #cbd5e1; }
+        table.dashboard-matrix th.col-yield-head,
+        table.dashboard-matrix td.col-yield-cell { border-left: 1px solid #cbd5e1; }
+        table.dashboard-matrix th.col-station-head,
+        table.dashboard-matrix th.col-yield-head {
+            font-size: 13px;
+            font-weight: 800;
+            color: #1e293b;
+            letter-spacing: 0.02em;
+            text-transform: none;
+            background: #f1f5f9;
+            border-bottom: 1.5px solid #b8c5d4;
+        }
+        table.dashboard-matrix th.col-yield-head { color: #334155; }
+
+        .sku-title-badge {
+            display: inline-block; padding: 5px 14px; border-radius: 6px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+        }
+        .badge-rel {
+            background: var(--rel-light); color: var(--rel-color);
+            border: 1px solid #bae6fd;
+        }
+        .badge-nonrel {
+            background: var(--non-rel-light); color: var(--non-rel-color);
+            border: 1px solid #a7f3d0;
+        }
+
+        .progress-wrapper {
+            display: flex; flex-direction: column; justify-content: center; gap: 5px;
+            width: 100%; height: 100%; padding: 0 4px;
+        }
+        .progress-stats-row {
+            display: flex; justify-content: space-between; align-items: center;
+            width: 100%; padding: 0 2px;
+        }
+        .progress-capsule { 
+            position: relative; width: 100%; height: 18px;
+            background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 9px; overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
+            border: 1px solid #cbd5e1;
+        }
+        .progress-fill { 
+            position: absolute; top: 0; left: 0; height: 100%; min-width: 0;
+            border-radius: 9px; z-index: 1;
+            overflow: hidden;
+        }
+        .progress-fill::before {
+            content: '';
+            position: absolute; top: -10%; left: -80%; width: 60%; height: 120%;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.12) 18%,
+                rgba(255, 255, 255, 0.85) 50%,
+                rgba(255, 255, 255, 0.12) 82%,
+                transparent 100%
+            );
+            transform: skewX(-22deg);
+            opacity: 0; pointer-events: none; z-index: 2;
+            filter: blur(0.4px);
+        }
+        .progress-fill.progress-fill-live::before {
+            animation: progress-shimmer var(--progress-cycle) linear infinite;
+        }
+        @keyframes progress-shimmer {
+            0% { left: -80%; opacity: 0; }
+            5% { opacity: 1; }
+            95% { left: 140%; opacity: 1; }
+            100% { left: 140%; opacity: 0; }
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.1) 42%, transparent 58%);
+            border-radius: inherit; pointer-events: none; z-index: 1;
+        }
+        .fill-rel {
+            background: linear-gradient(90deg, #0369a1 0%, #0ea5e9 40%, #38bdf8 70%, #0ea5e9 100%);
+            background-size: 220% 100%;
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08), 0 0 12px rgba(14, 165, 233, 0.25);
+        }
+        .fill-nonrel {
+            background: linear-gradient(90deg, #047857 0%, #10b981 40%, #34d399 70%, #10b981 100%);
+            background-size: 220% 100%;
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08), 0 0 12px rgba(16, 185, 129, 0.22);
+        }
+        .fill-rel.progress-fill-live {
+            animation: progress-gradient-flow var(--progress-cycle) linear infinite,
+                       progress-glow-rel var(--progress-cycle) ease-in-out infinite;
+        }
+        .fill-nonrel.progress-fill-live {
+            animation: progress-gradient-flow var(--progress-cycle) linear infinite,
+                       progress-glow-nonrel var(--progress-cycle) ease-in-out infinite;
+        }
+        @keyframes progress-gradient-flow {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+        @keyframes progress-glow-rel {
+            0%, 100% { box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08), 0 0 10px rgba(14, 165, 233, 0.22); }
+            50% { box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08), 0 0 18px rgba(56, 189, 248, 0.55); }
+        }
+        @keyframes progress-glow-nonrel {
+            0%, 100% { box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08), 0 0 10px rgba(16, 185, 129, 0.22); }
+            50% { box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08), 0 0 18px rgba(52, 211, 153, 0.55); }
+        }
+
+        .progress-stat {
+            flex-shrink: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 15px; font-weight: 700; line-height: 1;
+            background: none; border: none; box-shadow: none;
+            text-shadow: none;
+        }
+        .progress-stat-count {
+            justify-content: flex-start;
+            color: #334155; letter-spacing: -0.02em;
+        }
+        .progress-stat-pct {
+            justify-content: flex-end;
+            font-size: 16px; font-weight: 800; letter-spacing: -0.02em;
+        }
+        .progress-wrapper-rel .progress-stat-pct { color: #0369a1; }
+        .progress-wrapper-nonrel .progress-stat-pct { color: #047857; }
+        .progress-stat-count .stat-sep { opacity: 0.45; margin: 0 3px; font-weight: 600; color: #94a3b8; }
+
+        .yield-wrap { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+        .yield-value {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 64px; padding: 5px 10px; border-radius: 8px;
+            font-size: 15px; font-weight: 700;
+            letter-spacing: -0.03em; line-height: 1;
+        }
+        .yield-status-good {
+            color: #047857;
+            background: #ecfdf5;
+            border: 1px solid #6ee7b7;
+        }
+        .yield-status-bad {
+            color: #b91c1c;
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+        }
+        .empty-placeholder { color: #94a3b8; font-size: 13px; font-weight: 600; }
+        #syncTime {
+            letter-spacing: -0.01em; font-size: 11px;
+            color: var(--text-muted); padding: 6px 14px;
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            transition: color 0.3s, border-color 0.3s, background 0.3s;
+        }
+        #syncTime.sync-time-flash {
+            color: var(--success);
+            border-color: rgba(22, 163, 74, 0.45);
+            background: #f0fdf4;
+        }
+
+        .footer {
+            position: relative; flex-shrink: 0;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 12px; color: var(--text-muted); padding-top: 12px;
+        }
+        .footer::before {
+            content: '';
+            position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            pointer-events: none;
+        }
+        .dots-container {
+            display: flex; gap: 10px; align-items: center; padding: 6px 14px; cursor: pointer; pointer-events: auto;
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+        }
+        .dot { width: 28px; height: 5px; background: #cbd5e1; border-radius: 3px; transition: all 0.35s ease; cursor: pointer; }
+        .dot:hover { background: #94a3b8; }
+        .dot.active { width: 44px; }
+        #dot-rel.active { background: var(--rel-color); box-shadow: 0 0 10px rgba(2, 132, 199, 0.35); }
+        #dot-nonrel.active { background: var(--non-rel-color); box-shadow: 0 0 10px rgba(5, 150, 105, 0.35); }
+        
+        .btn {
+            padding: 6px 12px; border: 1px solid var(--border);
+            background: var(--panel); color: var(--text-main);
+            font-size: 12px; cursor: pointer; border-radius: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+        }
+        .btn-icon {
+            width: 36px; height: 36px; padding: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 17px; line-height: 1;
+        }
+        .btn:hover {
+            background: #f8fafc;
+            border-color: #7dd3fc;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.12);
+        }
+        .btn-primary {
+            background: var(--rel-light);
+            border-color: #7dd3fc;
+            color: var(--rel-color);
+        }
+        .btn-ghost { opacity: 0.75; }
+
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; z-index: 1000;
+            background: rgba(15, 23, 42, 0.35); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            width: min(720px, 96vw); max-height: 88vh; overflow: auto;
+            background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
+        }
+        .modal-head {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px; border-bottom: 1px solid var(--border);
+            background: #f8fafc;
+        }
+        .modal-head h3 { font-size: 16px; font-weight: 600; color: var(--text-main); }
+        .modal-close {
+            border: none; background: transparent; color: var(--text-muted);
+            font-size: 22px; cursor: pointer; line-height: 1;
+        }
+        .settings-body { padding: 16px 20px 20px; }
+        .settings-section {
+            margin-bottom: 16px; padding-bottom: 14px;
+            border-bottom: 1px dashed var(--border);
+        }
+        .settings-section:last-of-type { border-bottom: none; margin-bottom: 0; }
+        .settings-section h4 { font-size: 12px; margin-bottom: 10px; letter-spacing: 1px; font-weight: 700; }
+        .settings-section.rel-block h4 { color: var(--rel-color); }
+        .settings-section.other-block h4 { color: var(--non-rel-color); }
+        .settings-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .field label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .field input, .field select {
+            width: 100%; padding: 8px 10px; border-radius: 6px;
+            border: 1px solid var(--border); background: #f8fafc;
+            color: var(--text-main); font-size: 13px;
+        }
+        .field input:focus, .field select:focus {
+            outline: none; border-color: #7dd3fc; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+        .field-hint { display: block; font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.4; }
+        .variant-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .custom-station-targets { display: grid; gap: 10px; margin-top: 10px; }
+        .custom-station-row {
+            padding: 10px; border: 1px solid var(--border); border-radius: 8px;
+            background: #f8fafc;
+        }
+        .custom-station-row h5 { font-size: 11px; margin-bottom: 8px; color: var(--text-main); }
+        .rel-only-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+        .rel-only-head h5 { margin-bottom: 0; }
+        .rel-only-toggle { color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+        .custom-station-row.is-disabled { opacity: 0.72; }
+        .settings-foot { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+        .page-title.page-title-row {
+            width: 100%;
+            justify-content: center;
+            gap: 0;
+        }
+        .page-title-text { white-space: nowrap; }
+        .page-title-row::after {
+            content: '';
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 140px; height: 2px; border-radius: 2px;
+            background: linear-gradient(90deg, transparent, var(--non-rel-color), transparent);
+            opacity: 0.55;
+        }
+        .phase-switcher {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
+            pointer-events: auto; flex-shrink: 0;
+        }
+        .phase-select {
+            padding: 7px 30px 7px 14px; border-radius: 20px;
+            border: 1px solid #a7f3d0;
+            background: var(--non-rel-light); color: var(--non-rel-color);
+            font-size: 12px; font-weight: 700; letter-spacing: 0.04em; cursor: pointer;
+            appearance: none;
+            box-shadow: 0 1px 3px rgba(5, 150, 105, 0.1);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23059669' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+        .phase-select:hover { border-color: #34d399; background-color: #ecfdf5; }
+        .phase-select:focus { outline: none; border-color: var(--non-rel-color); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="live-status">Auto Scrolling</div>
+        <div class="header-title">
+            <h1>EQT Test Dashboard</h1>
+        </div>
+        <div class="controls">
+            <button type="button" class="btn btn-icon" id="btnToggleSettings" aria-label="Settings" title="Settings">⚙</button>
+            <button type="button" class="btn btn-icon" id="btnPausePlay" aria-label="Pause slideshow" title="Pause slideshow">⏸</button>
+            <button type="button" class="btn btn-icon" id="btnFullscreen" aria-label="Fullscreen" title="Fullscreen">⛶</button>
+        </div>
+    </div>
+
+    <div class="viewport" id="swipeViewport">
+        <div class="slider-track" id="sliderTrack">
+            
+            <div class="slide-page slide-rel">
+                <div class="page-title rel">✦ REL Testing ✦</div>
+                <div class="grid-split">
+                    <div class="table-container" id="rel-table-left"></div>
+                    <div class="table-container" id="rel-table-right"></div>
+                </div>
+            </div>
+
+            <div class="slide-page slide-nonrel">
+                <div class="page-title nonrel page-title-row">
+                    <span class="page-title-text" id="nonRelPageTitle">✦ PRB Testing ✦</span>
+                    <div class="phase-switcher">
+                        <select id="phaseSelect" class="phase-select" aria-label="Select phase"></select>
+                    </div>
+                </div>
+                <div class="grid-split">
+                    <div class="table-container" id="nonrel-table-left"></div>
+                    <div class="table-container" id="nonrel-table-right"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="footer">
+        <div id="syncTime" class="num-font">Updated —</div>
+        <div class="dots-container">
+            <div class="dot active" id="dot-rel" title="Switch to REL view"></div>
+            <div class="dot" id="dot-nonrel" title="Switch to phase view (DVT/EVT/PRB…)"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="settingsModal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-labelledby="settingsModalTitle">
+            <div class="modal-head">
+                <h3 id="settingsModalTitle">看板设置</h3>
+                <button type="button" class="modal-close" id="btnCloseSettings" aria-label="关闭">×</button>
+            </div>
+            <div class="settings-body">
+                <div class="settings-section">
+                    <h4 style="color:var(--text-main);">数据日期</h4>
+                    <div class="settings-grid">
+                        <div class="field">
+                            <label>开始日期</label>
+                            <input type="date" id="dateStart">
+                        </div>
+                        <div class="field">
+                            <label>结束日期</label>
+                            <input type="date" id="dateEnd">
+                        </div>
+                        <div class="field">
+                            <label>每日归档</label>
+                            <input type="text" value="23:59:59" disabled>
+                            <span class="field-hint">固定时刻正式归档，不可修改</span>
+                        </div>
+                        <div class="field">
+                            <label>定时刷新（分钟）</label>
+                            <input type="number" id="refreshIntervalMinutes" min="1" value="60">
+                            <span class="field-hint">后台每隔 N 分钟增量预览（不归档）；需运行 serve_dashboard.py</span>
+                        </div>
+                    </div>
+                    <span class="field-hint">结束日期 = 已归档的最后一天；23:59:59 归档 frozenThrough 的下一天，白天按间隔预览</span>
+                </div>
+                <div class="settings-section">
+                    <h4 style="color:var(--success);">增量拉取（保留历史）</h4>
+                    <div class="settings-grid">
+                        <div class="field">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                <input type="checkbox" id="incrementalEnabled" style="width:auto;">
+                                启用增量拉取
+                            </label>
+                        </div>
+                        <div class="field">
+                            <label>每次最多拉取（天）</label>
+                            <input type="number" id="incrementalFetchDays" min="1" value="7">
+                        </div>
+                    </div>
+                    <p id="incrementalStatus" class="field-hint" style="margin-top:8px;color:var(--text-main);"></p>
+                    <span class="field-hint">全量拉取并归档后，历史数据保存在本地；后续刷新只请求归档日期之后、且最近 N 天内的数据，查询更快</span>
+                </div>
+                <div class="settings-section">
+                    <h4 style="color:var(--text-main);">看板轮播</h4>
+                    <div class="settings-grid">
+                        <div class="field">
+                            <label>页面停留时间（秒）</label>
+                            <input type="number" id="slideDwellSeconds" min="5" value="30">
+                            <span class="field-hint">REL 与阶段页自动切换时，每页停留时长</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h4 style="color:var(--text-main);">统计规则</h4>
+                    <div class="field">
+                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                            <input type="checkbox" id="dedupeBySn" style="width:auto;" checked>
+                            按 SN 去重（同一阶段内同一 SN 只计最新一次测试）
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-section rel-block">
+                    <h4>REL</h4>
+                    <div class="settings-grid">
+                        <div class="field">
+                            <label>日目标（M / E 各）</label>
+                            <input type="number" id="relDailyTarget" min="0" value="20">
+                            <span class="field-hint">M 与 E 各 N/天；左右不区分，BM+BL→M，BP+BN→E</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-section other-block">
+                    <h4 id="otherSectionTitle">非 REL 阶段</h4>
+                    <div class="settings-grid">
+                        <div class="field">
+                            <label>默认显示阶段</label>
+                            <select id="selectedPhase">
+                                <option value="DVT">DVT</option>
+                                <option value="EVT">EVT</option>
+                                <option value="PVT">PVT</option>
+                                <option value="PPVT">PPVT</option>
+                                <option value="PRB">PRB</option>
+                                <option value="P1">P1</option>
+                                <option value="OVB">OVB</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>显示名称（兼容）</label>
+                            <input type="text" id="otherLabel" placeholder="PRB">
+                        </div>
+                    </div>
+                    <div class="variant-inputs" style="margin-top:12px;">
+                        <div class="field"><label>M 合计目标</label><input type="number" id="prbM" min="0" value="0"></div>
+                        <div class="field"><label>E 合计目标</label><input type="number" id="prbE" min="0" value="0"></div>
+                    </div>
+                    <span class="field-hint">第二页可在 DVT/EVT/PVT/PPVT/PRB/P1/OVB 间切换；REL 固定看工单含 REL</span>
+                </div>
+                <div class="settings-section">
+                    <h4 style="color:var(--non-rel-color);">仅阶段工站目标</h4>
+                    <div class="custom-station-targets" id="phaseOnlySettings"></div>
+                </div>
+                <div class="settings-section">
+                    <h4 style="color:var(--rel-color);">仅 REL 工站目标</h4>
+                    <span class="field-hint">Charge-Discharge 按每周 M/E 目标累计，自启用日起算；关闭「启用」时看板显示 —</span>
+                    <div class="custom-station-targets" id="relOnlySettings"></div>
+                </div>
+                <div class="settings-foot">
+                    <button type="button" class="btn btn-primary" id="btnApply">应用</button>
+                    <button type="button" class="btn" id="btnRefreshNow">立即刷新（含增量预览）</button>
+                    <button type="button" class="btn btn-ghost" id="btnReset">恢复默认</button>
+                </div>
+                <p id="settingsHint" style="margin-top:12px;font-size:12px;color:var(--text-muted);"></p>
+            </div>
+        </div>
+    </div>
+
+    <script type="application/json" id="raw-data-package">{"generatedAt": "2026-06-05 16:49:58", "previewDay": null, "archiveSummary": {"stations": 18, "records": 27950, "frozenThrough": "2026-06-04", "archivedAt": "2026-06-05 10:37:45"}, "phaseTypes": ["DVT", "EVT", "PVT", "PPVT", "PRB", "P1", "OVB"], "stations": [{"name": "CHECK-IN", "stationId": "M03-EQT-CHECK-IN", "mode": "both", "rel": {"BM": {"pass": 167, "fail": 0}, "BL": {"pass": 159, "fail": 0}, "BP": {"pass": 151, "fail": 0}, "BN": {"pass": 157, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 117, "fail": 0}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 67, "fail": 0}, "BL": {"pass": 69, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}, "P1": {"BM": {"pass": 2, "fail": 0}, "BL": {"pass": 1, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 135, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 67, "fail": 0}, "BL": {"pass": 69, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}}, {"name": "Basketball-Football", "stationId": "M03-EQT-Basketball-Football", "mode": "both", "rel": {"BM": {"pass": 164, "fail": 0}, "BL": {"pass": 156, "fail": 0}, "BP": {"pass": 149, "fail": 0}, "BN": {"pass": 153, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 116, "fail": 0}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 60, "fail": 0}, "BL": {"pass": 62, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}, "P1": {"BM": {"pass": 1, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 135, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 60, "fail": 0}, "BL": {"pass": 62, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}}, {"name": "Coffee-Store", "stationId": "M03-EQT-Coffee-Convenience Store", "mode": "both", "rel": {"BM": {"pass": 164, "fail": 0}, "BL": {"pass": 156, "fail": 0}, "BP": {"pass": 149, "fail": 0}, "BN": {"pass": 153, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 116, "fail": 0}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 57, "fail": 0}, "BL": {"pass": 59, "fail": 0}, "BP": {"pass": 91, "fail": 0}, "BN": {"pass": 91, "fail": 0}}, "P1": {"BM": {"pass": 1, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 135, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 57, "fail": 0}, "BL": {"pass": 59, "fail": 0}, "BP": {"pass": 91, "fail": 0}, "BN": {"pass": 91, "fail": 0}}}, {"name": "Commute", "stationId": "M03-EQT-Commute", "mode": "both", "rel": {"BM": {"pass": 164, "fail": 0}, "BL": {"pass": 156, "fail": 0}, "BP": {"pass": 149, "fail": 0}, "BN": {"pass": 153, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 116, "fail": 0}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 58, "fail": 0}, "BL": {"pass": 60, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}, "P1": {"BM": {"pass": 1, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 135, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 58, "fail": 0}, "BL": {"pass": 60, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}}, {"name": "Gym", "stationId": "M03-EQT-Gym", "mode": "both", "rel": {"BM": {"pass": 164, "fail": 0}, "BL": {"pass": 155, "fail": 0}, "BP": {"pass": 149, "fail": 0}, "BN": {"pass": 153, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 116, "fail": 0}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 60, "fail": 0}, "BL": {"pass": 62, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}, "P1": {"BM": {"pass": 1, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 135, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 60, "fail": 0}, "BL": {"pass": 62, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}}, {"name": "Home", "stationId": "M03-EQT-Home", "mode": "both", "rel": {"BM": {"pass": 164, "fail": 0}, "BL": {"pass": 155, "fail": 0}, "BP": {"pass": 149, "fail": 0}, "BN": {"pass": 154, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 117, "fail": 0}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 58, "fail": 0}, "BL": {"pass": 60, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}, "P1": {"BM": {"pass": 1, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 135, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 58, "fail": 0}, "BL": {"pass": 60, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}}, {"name": "Office", "stationId": "M03-EQT-Office", "mode": "both", "rel": {"BM": {"pass": 164, "fail": 0}, "BL": {"pass": 156, "fail": 0}, "BP": {"pass": 149, "fail": 0}, "BN": {"pass": 153, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 116, "fail": 0}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 59, "fail": 0}, "BL": {"pass": 61, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}, "P1": {"BM": {"pass": 1, "fail": 0}, "BL": {"pass": 1, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 135, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 59, "fail": 0}, "BL": {"pass": 61, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}}, {"name": "Quiet Room", "stationId": "M03-EQT-Quiet Room", "mode": "both", "rel": {"BM": {"pass": 164, "fail": 0}, "BL": {"pass": 155, "fail": 0}, "BP": {"pass": 149, "fail": 0}, "BN": {"pass": 153, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 116, "fail": 0}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 59, "fail": 0}, "BL": {"pass": 61, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}, "P1": {"BM": {"pass": 1, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 135, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 59, "fail": 0}, "BL": {"pass": 61, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}}, {"name": "Running Track", "stationId": "M03-EQT-Running Track", "mode": "both", "rel": {"BM": {"pass": 164, "fail": 0}, "BL": {"pass": 156, "fail": 0}, "BP": {"pass": 149, "fail": 0}, "BN": {"pass": 153, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 116, "fail": 0}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 60, "fail": 0}, "BL": {"pass": 62, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}, "P1": {"BM": {"pass": 1, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 135, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 60, "fail": 0}, "BL": {"pass": 62, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}}, {"name": "Stairs", "stationId": "M03-EQT-Stairs", "mode": "both", "rel": {"BM": {"pass": 164, "fail": 0}, "BL": {"pass": 156, "fail": 0}, "BP": {"pass": 149, "fail": 0}, "BN": {"pass": 153, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 116, "fail": 0}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 60, "fail": 0}, "BL": {"pass": 62, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}, "P1": {"BM": {"pass": 1, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 135, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 60, "fail": 0}, "BL": {"pass": 62, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}}, {"name": "Noise Room", "stationId": "M03-EQT-Noise Room", "mode": "both", "rel": {"BM": {"pass": 164, "fail": 0}, "BL": {"pass": 156, "fail": 0}, "BP": {"pass": 149, "fail": 0}, "BN": {"pass": 153, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 116, "fail": 0}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 58, "fail": 0}, "BL": {"pass": 60, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}, "P1": {"BM": {"pass": 1, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 135, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 58, "fail": 0}, "BL": {"pass": 60, "fail": 0}, "BP": {"pass": 92, "fail": 0}, "BN": {"pass": 92, "fail": 0}}}, {"name": "Test", "stationId": "M03-EQT-Test", "mode": "both", "rel": {"BM": {"pass": 164, "fail": 0}, "BL": {"pass": 155, "fail": 0}, "BP": {"pass": 149, "fail": 0}, "BN": {"pass": 153, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 114, "fail": 1}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 83, "fail": 0}, "BN": {"pass": 83, "fail": 0}}, "P1": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 132, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 83, "fail": 0}, "BN": {"pass": 83, "fail": 0}}}, {"name": "CHECK-OUT", "stationId": "M03-EQT-CHECK-OUT", "mode": "both", "rel": {"BM": {"pass": 164, "fail": 0}, "BL": {"pass": 155, "fail": 0}, "BP": {"pass": 149, "fail": 0}, "BN": {"pass": 153, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "EVT": {"BM": {"pass": 112, "fail": 0}, "BL": {"pass": 105, "fail": 0}, "BP": {"pass": 115, "fail": 0}, "BN": {"pass": 105, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 83, "fail": 0}, "BN": {"pass": 83, "fail": 0}}, "P1": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 1, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 114, "fail": 0}, "BL": {"pass": 115, "fail": 0}, "BP": {"pass": 132, "fail": 0}, "BN": {"pass": 134, "fail": 0}}}, "nonRel": {"BM": {"pass": 50, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 83, "fail": 0}, "BN": {"pass": 83, "fail": 0}}}, {"name": "Charge-Discharge", "stationId": "M03-EQT-Charge-Discharge", "mode": "rel_only", "rel": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "EVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "P1": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}}, "nonRel": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}}, {"name": "Humdity Test", "stationId": "M03-CQA-Humdity test", "mode": "phase_only", "rel": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "EVT": {"BM": {"pass": 57, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 25, "fail": 0}, "BL": {"pass": 25, "fail": 0}, "BP": {"pass": 33, "fail": 0}, "BN": {"pass": 33, "fail": 0}}, "P1": {"BM": {"pass": 1, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 51, "fail": 0}, "BL": {"pass": 50, "fail": 0}, "BP": {"pass": 50, "fail": 0}, "BN": {"pass": 50, "fail": 0}}}, "nonRel": {"BM": {"pass": 25, "fail": 0}, "BL": {"pass": 25, "fail": 0}, "BP": {"pass": 33, "fail": 0}, "BN": {"pass": 33, "fail": 0}}}, {"name": "Constant Temp Room", "stationId": "M03-EQT-Constant Temp Room", "mode": "phase_only", "rel": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "EVT": {"BM": {"pass": 9, "fail": 0}, "BL": {"pass": 5, "fail": 0}, "BP": {"pass": 5, "fail": 0}, "BN": {"pass": 5, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "P1": {"BM": {"pass": 1, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 5, "fail": 0}, "BL": {"pass": 5, "fail": 0}, "BP": {"pass": 2, "fail": 0}, "BN": {"pass": 5, "fail": 0}}}, "nonRel": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}}, {"name": "Beach", "stationId": "M03-EQT-Beach", "mode": "phase_only", "rel": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "EVT": {"BM": {"pass": 7, "fail": 0}, "BL": {"pass": 3, "fail": 0}, "BP": {"pass": 3, "fail": 0}, "BN": {"pass": 3, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "P1": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 3, "fail": 0}, "BL": {"pass": 3, "fail": 0}, "BP": {"pass": 3, "fail": 0}, "BN": {"pass": 3, "fail": 0}}}, "nonRel": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}}, {"name": "Other", "stationId": "M03-EQT-Other", "mode": "phase_only", "rel": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "phases": {"DVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "EVT": {"BM": {"pass": 10, "fail": 0}, "BL": {"pass": 7, "fail": 0}, "BP": {"pass": 7, "fail": 0}, "BN": {"pass": 7, "fail": 0}}, "PVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PPVT": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "PRB": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "P1": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}, "OVB": {"BM": {"pass": 7, "fail": 0}, "BL": {"pass": 7, "fail": 0}, "BP": {"pass": 7, "fail": 0}, "BN": {"pass": 7, "fail": 0}}}, "nonRel": {"BM": {"pass": 0, "fail": 0}, "BL": {"pass": 0, "fail": 0}, "BP": {"pass": 0, "fail": 0}, "BN": {"pass": 0, "fail": 0}}}], "stationRegistry": [{"id": "M03-EQT-CHECK-IN", "name": "CHECK-IN", "mode": "both", "group": "main"}, {"id": "M03-EQT-Basketball-Football", "name": "Basketball-Football", "mode": "both", "group": "main"}, {"id": "M03-EQT-Coffee-Convenience Store", "name": "Coffee-Store", "mode": "both", "group": "main"}, {"id": "M03-EQT-Commute", "name": "Commute", "mode": "both", "group": "main"}, {"id": "M03-EQT-Gym", "name": "Gym", "mode": "both", "group": "main"}, {"id": "M03-EQT-Home", "name": "Home", "mode": "both", "group": "main"}, {"id": "M03-EQT-Office", "name": "Office", "mode": "both", "group": "main"}, {"id": "M03-EQT-Quiet Room", "name": "Quiet Room", "mode": "both", "group": "main"}, {"id": "M03-EQT-Running Track", "name": "Running Track", "mode": "both", "group": "main"}, {"id": "M03-EQT-Stairs", "name": "Stairs", "mode": "both", "group": "main"}, {"id": "M03-EQT-Noise Room", "name": "Noise Room", "mode": "both", "group": "main"}, {"id": "M03-EQT-Test", "name": "Test", "mode": "both", "group": "main"}, {"id": "M03-EQT-CHECK-OUT", "name": "CHECK-OUT", "mode": "both", "group": "main"}, {"id": "M03-EQT-Charge-Discharge", "name": "Charge-Discharge", "mode": "rel_only", "group": "main"}, {"id": "M03-CQA-Humdity test", "name": "Humdity Test", "mode": "phase_only", "group": "phase"}, {"id": "M03-EQT-Constant Temp Room", "name": "Constant Temp Room", "mode": "phase_only", "group": "phase"}, {"id": "M03-EQT-Beach", "name": "Beach", "mode": "phase_only", "group": "phase"}, {"id": "M03-EQT-Other", "name": "Other", "mode": "phase_only", "group": "phase"}], "relActiveDates": ["2026-05-04", "2026-05-05", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-09", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-16", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-23", "2026-05-25", "2026-06-01", "2026-06-02"], "relActiveDays": 19, "relMTarget": 326, "relETarget": 308, "relVariantTargets": {"BM": 167, "BL": 159, "BP": 151, "BN": 157}, "checkinRelDaily": [{"date": "2026-05-04", "m": 30, "e": 0, "mTarget": 20, "eTarget": 0, "variants": {"BM": 15, "BL": 15, "BP": 0, "BN": 0}}, {"date": "2026-05-05", "m": 20, "e": 10, "mTarget": 20, "eTarget": 20, "variants": {"BM": 10, "BL": 10, "BP": 5, "BN": 5}}, {"date": "2026-05-06", "m": 0, "e": 34, "mTarget": 0, "eTarget": 20, "variants": {"BM": 0, "BL": 0, "BP": 17, "BN": 17}}, {"date": "2026-05-07", "m": 21, "e": 9, "mTarget": 20, "eTarget": 20, "variants": {"BM": 10, "BL": 11, "BP": 4, "BN": 5}}, {"date": "2026-05-08", "m": 43, "e": 2, "mTarget": 20, "eTarget": 20, "variants": {"BM": 22, "BL": 21, "BP": 2, "BN": 0}}, {"date": "2026-05-09", "m": 20, "e": 18, "mTarget": 20, "eTarget": 20, "variants": {"BM": 10, "BL": 10, "BP": 8, "BN": 10}}, {"date": "2026-05-11", "m": 0, "e": 40, "mTarget": 0, "eTarget": 20, "variants": {"BM": 0, "BL": 0, "BP": 20, "BN": 20}}, {"date": "2026-05-12", "m": 20, "e": 22, "mTarget": 20, "eTarget": 20, "variants": {"BM": 10, "BL": 10, "BP": 13, "BN": 9}}, {"date": "2026-05-13", "m": 0, "e": 40, "mTarget": 0, "eTarget": 20, "variants": {"BM": 0, "BL": 0, "BP": 20, "BN": 20}}, {"date": "2026-05-14", "m": 43, "e": 0, "mTarget": 20, "eTarget": 0, "variants": {"BM": 21, "BL": 22, "BP": 0, "BN": 0}}, {"date": "2026-05-15", "m": 20, "e": 20, "mTarget": 20, "eTarget": 20, "variants": {"BM": 10, "BL": 10, "BP": 10, "BN": 10}}, {"date": "2026-05-16", "m": 10, "e": 36, "mTarget": 20, "eTarget": 20, "variants": {"BM": 3, "BL": 7, "BP": 20, "BN": 16}}, {"date": "2026-05-19", "m": 14, "e": 7, "mTarget": 20, "eTarget": 20, "variants": {"BM": 7, "BL": 7, "BP": 4, "BN": 3}}, {"date": "2026-05-20", "m": 16, "e": 4, "mTarget": 20, "eTarget": 20, "variants": {"BM": 10, "BL": 6, "BP": 0, "BN": 4}}, {"date": "2026-05-21", "m": 13, "e": 10, "mTarget": 20, "eTarget": 20, "variants": {"BM": 11, "BL": 2, "BP": 0, "BN": 10}}, {"date": "2026-05-23", "m": 40, "e": 0, "mTarget": 20, "eTarget": 0, "variants": {"BM": 20, "BL": 20, "BP": 0, "BN": 0}}, {"date": "2026-05-25", "m": 0, "e": 20, "mTarget": 0, "eTarget": 20, "variants": {"BM": 0, "BL": 0, "BP": 10, "BN": 10}}, {"date": "2026-06-01", "m": 0, "e": 20, "mTarget": 0, "eTarget": 20, "variants": {"BM": 0, "BL": 0, "BP": 10, "BN": 10}}, {"date": "2026-06-02", "m": 16, "e": 16, "mTarget": 20, "eTarget": 20, "variants": {"BM": 8, "BL": 8, "BP": 8, "BN": 8}}], "defaultSettings": {"relDailyTarget": 20, "dateStart": "2026-01-05", "dateEnd": "2026-06-04", "nonRelTargets": {"M03-EQT-CHECK-IN": {"M": 200, "E": 200}, "M03-EQT-Basketball-Football": {"M": 200, "E": 200}, "M03-EQT-Coffee-Convenience Store": {"M": 200, "E": 200}, "M03-EQT-Commute": {"M": 200, "E": 200}, "M03-EQT-Gym": {"M": 200, "E": 200}, "M03-EQT-Home": {"M": 200, "E": 200}, "M03-EQT-Office": {"M": 200, "E": 200}, "M03-EQT-Quiet Room": {"M": 200, "E": 200}, "M03-EQT-Running Track": {"M": 200, "E": 200}, "M03-EQT-Stairs": {"M": 200, "E": 200}, "M03-EQT-Noise Room": {"M": 200, "E": 200}, "M03-EQT-Test": {"M": 200, "E": 200}, "M03-EQT-CHECK-OUT": {"M": 200, "E": 200}, "M03-CQA-Humdity test": {"M": 100, "E": 100}, "M03-EQT-Constant Temp Room": {"M": 20, "E": 20}, "M03-EQT-Beach": {"M": 12, "E": 12}, "M03-EQT-Other": {"M": 28, "E": 28}}, "relOnlyTargets": {"M03-EQT-Charge-Discharge": {"M": 10, "E": 10, "enabled": false, "weekly": true, "enabledSince": null}}, "phaseOnlyTargets": {"M03-CQA-Humdity test": {"M": 100, "E": 100}, "M03-EQT-Constant Temp Room": {"M": 20, "E": 20}, "M03-EQT-Beach": {"M": 12, "E": 12}, "M03-EQT-Other": {"M": 28, "E": 28}}, "dateRange": {"start": "2026-01-05", "end": "2026-06-04"}, "rel": {"dailyTarget": 20, "dateStart": "2026-01-05", "dateEnd": "2026-06-04"}, "other": {"label": "PRB", "selectedPhase": "PRB", "dateStart": "2026-01-05", "dateEnd": "2026-06-04", "targets": {"M": 200, "E": 200}}, "refresh": {"intervalMinutes": 60, "slideDwellSeconds": 15}, "incremental": {"enabled": true, "frozenThrough": "2026-06-04", "fetchDays": 3}, "selectedPhase": "PRB", "phaseTargets": {}, "phaseOnly": {"M03-CQA-Humdity test": {"M": 100, "E": 100}, "M03-EQT-Constant Temp Room": {"M": 20, "E": 20}, "M03-EQT-Beach": {"M": 12, "E": 12}, "M03-EQT-Other": {"M": 28, "E": 28}}, "relOnly": {"M03-EQT-Charge-Discharge": {"M": 10, "E": 10, "enabled": false, "weekly": true, "enabledSince": null}}, "counting": {"dedupeBySn": false}}}</script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const REL_M = ['BM', 'BL'];
+            const REL_E = ['BP', 'BN'];
+            const VARIANTS = ['BM', 'BL', 'BP', 'BN'];
+            const CHECKIN_STATION_ID = 'M03-EQT-CHECK-IN';
+            const DASHBOARD_API_PORT = 8765;
+            const LS_KEY = 'eqt_report_settings_v6';
+            const PHASE_TYPES = ['DVT', 'EVT', 'PVT', 'PPVT', 'PRB', 'P1', 'OVB'];
+            const DEFAULT_PHASE = 'PRB';
+            const DEFAULT_OTHER = { label: 'PRB', targets: { M: 400, E: 400 } };
+            const DEFAULT_REL_ONLY = { M: 10, E: 10, enabled: false, weekly: true, enabledSince: null };
+            let selectedPhase = DEFAULT_PHASE;
+            let restartSlideShow = null;
+            const ARCHIVE_TIME = '23:59:59';
+
+            function normalizeRefreshSettings(refresh) {
+                const r = refresh || {};
+                const dwell = parseInt(r.slideDwellSeconds, 10);
+                return {
+                    intervalMinutes: Math.max(1, parseInt(r.intervalMinutes, 10) || 60),
+                    slideDwellSeconds: Number.isNaN(dwell) ? 30 : Math.max(5, dwell),
+                };
+            }
+
+            function getSlideDwellMs() {
+                return normalizeRefreshSettings(settings.refresh).slideDwellSeconds * 1000;
+            }
+            let syncSlideClone = null;
+
+            function todayISO() {
+                const d = new Date();
+                const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+                return local.toISOString().slice(0, 10);
+            }
+
+            function resolveDateRange(src) {
+                if (src?.dateRange?.start && src?.dateRange?.end) {
+                    return { start: src.dateRange.start, end: src.dateRange.end };
+                }
+                const start = src?.rel?.dateStart || src?.dateStart || todayISO();
+                const end = src?.rel?.dateEnd || src?.dateEnd || src?.other?.dateEnd || todayISO();
+                return { start, end };
+            }
+
+            function addDaysISO(isoDate, days) {
+                const parts = String(isoDate).split('-').map(Number);
+                if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
+                const [y, m, d] = parts;
+                const dt = new Date(Date.UTC(y, m - 1, d + days));
+                return dt.toISOString().slice(0, 10);
+            }
+
+            function resolveFetchRange(src) {
+                const { start, end } = resolveDateRange(src);
+                const inc = src?.incremental || {};
+                if (!inc.enabled || !inc.frozenThrough) {
+                    return { start, end, incremental: false };
+                }
+                const next = addDaysISO(inc.frozenThrough, 1);
+                if (!next) {
+                    return { start, end, incremental: false };
+                }
+                return {
+                    start: next,
+                    end: next,
+                    incremental: true,
+                };
+            }
+
+            function nextIncrementalDay(inc) {
+                const frozen = inc?.frozenThrough;
+                if (!frozen) return null;
+                return addDaysISO(frozen, 1);
+            }
+
+            function applyUnifiedDates(s) {
+                const dr = resolveDateRange(s);
+                s.dateRange = { start: dr.start, end: dr.end };
+                s.rel = s.rel || {};
+                s.other = s.other || {};
+                s.rel.dateStart = dr.start;
+                s.rel.dateEnd = dr.end;
+                s.other.dateStart = dr.start;
+                s.other.dateEnd = dr.end;
+                return s;
+            }
+            const emptyCell = '<div class="empty-placeholder">—</div>';
+            let dataPackage = null;
+            let settings = {};
+            let lastKnownRefresh = '';
+
+            function resolveApiBase() {
+                if (location.protocol !== 'http:' && location.protocol !== 'https:') {
+                    return `http://localhost:${DASHBOARD_API_PORT}`;
+                }
+                const port = location.port;
+                if (port === String(DASHBOARD_API_PORT)) return '';
+                const host = location.hostname || 'localhost';
+                return `http://${host}:${DASHBOARD_API_PORT}`;
+            }
+
+            function normalizeSideTargets(t) {
+                if (!t || typeof t !== 'object') return { M: 0, E: 0 };
+                if ('M' in t || 'E' in t) {
+                    return { M: Number(t.M) || 0, E: Number(t.E) || 0 };
+                }
+                return {
+                    M: (Number(t.BM) || 0) + (Number(t.BL) || 0),
+                    E: (Number(t.BP) || 0) + (Number(t.BN) || 0),
+                };
+            }
+
+            function sumSide(bucket, keys) {
+                return keys.reduce((acc, v) => {
+                    acc.pass += bucket[v]?.pass || 0;
+                    acc.fail += bucket[v]?.fail || 0;
+                    return acc;
+                }, { pass: 0, fail: 0 });
+            }
+
+            function parseDataPackage() {
+                const raw = document.getElementById('raw-data-package').textContent.trim();
+                if (!raw || raw.startsWith('/*')) return null;
+                try {
+                    return JSON.parse(raw);
+                } catch (err) {
+                    console.error('数据解析失败', err);
+                    return null;
+                }
+            }
+
+            function flashSyncTime() {
+                const el = document.getElementById('syncTime');
+                if (!el) return;
+                el.classList.add('sync-time-flash');
+                setTimeout(() => el.classList.remove('sync-time-flash'), 2000);
+            }
+
+            async function softReloadDashboard(statusLastRun) {
+                const prevTime = resolveLatestUpdateTime();
+                const base = API_BASE || resolveApiBase();
+                const res = await fetch(`${base}/index.html`, { cache: 'no-store' });
+                if (!res.ok) throw new Error('无法读取最新看板数据');
+                const html = await res.text();
+                const m = html.match(/id="raw-data-package">([\s\S]*?)<\/script>/);
+                if (!m) throw new Error('看板数据格式异常');
+                const pkg = JSON.parse(m[1]);
+                dataPackage = pkg;
+                const el = document.getElementById('raw-data-package');
+                if (el) el.textContent = m[1];
+                if (statusLastRun) {
+                    lastKnownRefresh = statusLastRun;
+                } else if (pkg.generatedAt) {
+                    lastKnownRefresh = pkg.generatedAt;
+                }
+                renderDashboard();
+                const nextTime = resolveLatestUpdateTime();
+                updateSyncTimeDisplay();
+                syncSlideClone?.();
+                if (nextTime !== prevTime && nextTime !== '—') {
+                    flashSyncTime();
+                }
+                return pkg;
+            }
+
+            function getStatusPollMs() {
+                const mins = normalizeRefreshSettings(settings.refresh).intervalMinutes;
+                return Math.max(10000, Math.min(45000, mins * 30 * 1000));
+            }
+
+            function orderedStations(pkg) {
+                const byId = Object.fromEntries((pkg.stations || []).map(s => [s.stationId, s]));
+                const reg = pkg.stationRegistry || [];
+                if (reg.length) {
+                    return reg.map(meta => {
+                        const st = byId[meta.id];
+                        if (!st) return null;
+                        return { ...st, mode: st.mode || meta.mode, name: st.name || meta.name };
+                    }).filter(Boolean);
+                }
+                return pkg.stations || [];
+            }
+
+            function getStationRegistry() {
+                return dataPackage?.stationRegistry || [];
+            }
+
+            function defaultSettings() {
+                const d = dataPackage?.defaultSettings || {};
+                const nonRel = {};
+                const phaseOnly = { ...(d.phaseOnly || d.phaseOnlyTargets || {}) };
+                const relOnly = { ...(d.relOnly || d.relOnlyTargets || {}) };
+                getStationRegistry().forEach(meta => {
+                    if (meta.mode === 'both') {
+                        nonRel[meta.id] = normalizeSideTargets(
+                            d.nonRelTargets?.[meta.id] || d.other?.targets || DEFAULT_OTHER.targets
+                        );
+                    } else if (meta.mode === 'phase_only') {
+                        phaseOnly[meta.id] = normalizeSideTargets({
+                            ...DEFAULT_OTHER.targets,
+                            ...(phaseOnly[meta.id] || {}),
+                        });
+                        nonRel[meta.id] = { ...phaseOnly[meta.id] };
+                    } else if (meta.mode === 'rel_only') {
+                        relOnly[meta.id] = normalizeRelOnlyEntry({
+                            ...DEFAULT_REL_ONLY,
+                            ...(relOnly[meta.id] || {}),
+                        });
+                    }
+                });
+                return applyUnifiedDates({
+                    dateRange: resolveDateRange(d),
+                    rel: {
+                        dailyTarget: d.rel?.dailyTarget ?? d.relDailyTarget ?? 20,
+                    },
+                    other: {
+                        label: d.other?.label || DEFAULT_OTHER.label,
+                        targets: normalizeSideTargets({
+                            ...DEFAULT_OTHER.targets,
+                            ...(d.other?.targets || {}),
+                        }),
+                    },
+                    refresh: normalizeRefreshSettings(d.refresh),
+                    incremental: {
+                        enabled: !!d.incremental?.enabled,
+                        frozenThrough: d.incremental?.frozenThrough || null,
+                        fetchDays: d.incremental?.fetchDays ?? 7,
+                    },
+                    counting: {
+                        dedupeBySn: d.counting?.dedupeBySn !== false,
+                    },
+                    selectedPhase: d.selectedPhase || d.other?.selectedPhase || DEFAULT_PHASE,
+                    phaseTargets: { ...(d.phaseTargets || {}) },
+                    phaseOnly,
+                    relOnly,
+                    nonRelTargets: nonRel,
+                });
+            }
+
+            function normalizeSettingsStore(s) {
+                applyUnifiedDates(s);
+                s.other.targets = normalizeSideTargets(s.other.targets);
+                Object.keys(s.phaseOnly || {}).forEach(id => {
+                    s.phaseOnly[id] = normalizeSideTargets(s.phaseOnly[id]);
+                });
+                Object.keys(s.relOnly || {}).forEach(id => {
+                    s.relOnly[id] = normalizeRelOnlyEntry(s.relOnly[id]);
+                });
+                Object.keys(s.nonRelTargets || {}).forEach(id => {
+                    s.nonRelTargets[id] = normalizeSideTargets(s.nonRelTargets[id]);
+                });
+                s.refresh = normalizeRefreshSettings(s.refresh);
+                return s;
+            }
+
+            function migrateSettings(raw) {
+                const base = defaultSettings();
+                if (raw.rel && raw.other) {
+                    return normalizeSettingsStore(applyUnifiedDates({
+                        ...base,
+                        dateRange: raw.dateRange || resolveDateRange(raw),
+                        rel: { ...base.rel, ...raw.rel },
+                        other: {
+                            ...base.other,
+                            ...raw.other,
+                            targets: normalizeSideTargets({
+                                ...base.other.targets,
+                                ...(raw.other.targets || {}),
+                            }),
+                        },
+                        refresh: { ...base.refresh, ...(raw.refresh || {}) },
+                        incremental: { ...base.incremental, ...(raw.incremental || {}) },
+                        counting: { ...base.counting, ...(raw.counting || {}) },
+                        selectedPhase: raw.selectedPhase || raw.other?.selectedPhase || base.selectedPhase,
+                        phaseTargets: { ...base.phaseTargets, ...(raw.phaseTargets || {}) },
+                        phaseOnly: { ...base.phaseOnly, ...(raw.phaseOnly || {}) },
+                        relOnly: { ...base.relOnly, ...(raw.relOnly || {}) },
+                        nonRelTargets: { ...base.nonRelTargets, ...(raw.nonRelTargets || {}) },
+                    }));
+                }
+                return normalizeSettingsStore(applyUnifiedDates({
+                    dateRange: resolveDateRange(raw),
+                    rel: {
+                        dailyTarget: raw.relDailyTarget ?? raw.rel?.dailyTarget ?? 20,
+                    },
+                    other: {
+                        label: raw.other?.label || 'PRB',
+                        targets: normalizeSideTargets({
+                            ...base.other.targets,
+                            ...(raw.other?.targets || {}),
+                        }),
+                    },
+                    refresh: { ...base.refresh, ...(raw.refresh || {}) },
+                    incremental: { ...base.incremental, ...(raw.incremental || {}) },
+                    selectedPhase: raw.selectedPhase || raw.other?.selectedPhase || base.selectedPhase,
+                    phaseTargets: { ...base.phaseTargets, ...(raw.phaseTargets || {}) },
+                    phaseOnly: { ...base.phaseOnly, ...(raw.phaseOnly || {}) },
+                    relOnly: { ...base.relOnly, ...(raw.relOnly || {}) },
+                    nonRelTargets: { ...base.nonRelTargets, ...(raw.nonRelTargets || {}) },
+                }));
+            }
+
+            function applyOtherTargetsObject(targets) {
+                const side = normalizeSideTargets(targets);
+                if (!settings.nonRelTargets) settings.nonRelTargets = {};
+                getStationRegistry().forEach(meta => {
+                    if (meta.mode === 'both') settings.nonRelTargets[meta.id] = { ...side };
+                });
+            }
+
+            async function fetchServerConfig() {
+                try {
+                    const res = await fetch(`${API_BASE}/api/config`, { cache: 'no-store' });
+                    if (!res.ok) return null;
+                    return await res.json();
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            async function pushServerConfig() {
+                applyUnifiedDates(settings);
+                const res = await fetch(`${API_BASE}/api/config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        dateRange: settings.dateRange,
+                        rel: settings.rel,
+                        other: settings.other,
+                        refresh: settings.refresh,
+                        incremental: settings.incremental,
+                        counting: settings.counting,
+                        selectedPhase: settings.selectedPhase,
+                        phaseTargets: settings.phaseTargets,
+                        phaseOnly: settings.phaseOnly,
+                        relOnly: settings.relOnly,
+                    }),
+                });
+                if (!res.ok) throw new Error('无法同步到本地服务');
+                return res.json();
+            }
+
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            async function fetchRefreshStatus() {
+                const res = await fetch(`${API_BASE}/api/status`, { cache: 'no-store' });
+                if (!res.ok) throw new Error('无法读取刷新状态');
+                return res.json();
+            }
+
+            async function triggerServerRefresh(onProgress) {
+                let res;
+                try {
+                    res = await fetch(`${API_BASE}/api/refresh?mode=preview`, { method: 'POST' });
+                } catch (err) {
+                    throw new Error(
+                        '无法连接本地服务，请先运行：python3 serve_dashboard.py，并通过 http://localhost:8765 打开看板'
+                    );
+                }
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    throw new Error(data.error || data.message || '后台刷新失败');
+                }
+                if (onProgress) onProgress(data.message || '刷新已开始…');
+
+                const deadline = Date.now() + 10 * 60 * 1000;
+                let lastMsg = '';
+                while (Date.now() < deadline) {
+                    await sleep(1500);
+                    let status;
+                    try {
+                        status = await fetchRefreshStatus();
+                    } catch (err) {
+                        throw new Error('刷新状态查询失败，请确认 serve_dashboard 仍在运行');
+                    }
+                    if (status.running) {
+                        const msg = status.message || '正在刷新…';
+                        if (msg !== lastMsg) {
+                            lastMsg = msg;
+                            if (onProgress) onProgress(msg);
+                        }
+                        continue;
+                    }
+                    if (status.ok) return status;
+                    throw new Error(status.message || '刷新失败');
+                }
+                throw new Error('刷新超时（超过 10 分钟），请缩小日期范围后重试');
+            }
+
+            async function loadSettings() {
+                let local = null;
+                try {
+                    const saved = localStorage.getItem(LS_KEY);
+                    if (saved) local = JSON.parse(saved);
+                    else {
+                        const legacy = localStorage.getItem('eqt_report_settings_v4') ||
+                            localStorage.getItem('eqt_report_settings_v3');
+                        if (legacy) local = JSON.parse(legacy);
+                    }
+                } catch (e) { /* ignore */ }
+
+                const server = await fetchServerConfig();
+                if (server) {
+                    settings = migrateSettings({ ...(local || {}), ...server });
+                } else if (local) {
+                    settings = migrateSettings(local);
+                } else {
+                    settings = defaultSettings();
+                }
+                normalizeSettingsStore(settings);
+                applyOtherTargetsObject(settings.other.targets);
+            }
+
+            function saveSettings() {
+                try {
+                    localStorage.setItem(LS_KEY, JSON.stringify(settings));
+                } catch (e) { /* ignore */ }
+            }
+
+            function filterCheckinDaily(start, end) {
+                return (dataPackage?.checkinRelDaily || []).filter(d => d.date >= start && d.date <= end);
+            }
+
+            function computeRelTargetsFromCheckin(start, end) {
+                const daily = filterCheckinDaily(start, end);
+                const variantTargets = { BM: 0, BL: 0, BP: 0, BN: 0 };
+                if (daily.length) {
+                    daily.forEach(d => {
+                        VARIANTS.forEach(v => {
+                            variantTargets[v] += d.variants?.[v] || 0;
+                        });
+                    });
+                } else if (dataPackage?.relVariantTargets) {
+                    Object.assign(variantTargets, dataPackage.relVariantTargets);
+                } else {
+                    const stations = dataPackage?.stations || [];
+                    const checkin = stations.find(s => s.stationId === CHECKIN_STATION_ID);
+                    if (checkin) {
+                        VARIANTS.forEach(v => {
+                            variantTargets[v] = checkin.rel[v]?.pass || 0;
+                        });
+                    }
+                }
+                return {
+                    M: variantTargets.BM + variantTargets.BL,
+                    E: variantTargets.BP + variantTargets.BN,
+                };
+            }
+
+            function getPhaseTypes() {
+                return dataPackage?.phaseTypes || PHASE_TYPES;
+            }
+
+            function emptyBuckets() {
+                return Object.fromEntries(VARIANTS.map(v => [v, { pass: 0, fail: 0 }]));
+            }
+
+            function getStationPhaseData(st, phase) {
+                if (st.phases && st.phases[phase]) return st.phases[phase];
+                if (phase === (settings.other?.selectedPhase || DEFAULT_PHASE) && st.nonRel) return st.nonRel;
+                return emptyBuckets();
+            }
+
+            function phaseHasData(phase) {
+                return orderedStations(dataPackage).some(st => {
+                    const d = getStationPhaseData(st, phase);
+                    return VARIANTS.some(v => (d[v]?.pass || 0) + (d[v]?.fail || 0) > 0);
+                });
+            }
+
+            function getPhaseTargets(st, phase) {
+                const mode = st.mode || 'both';
+                const phaseTargets = settings.phaseTargets?.[phase];
+                let raw = phaseTargets;
+                if (!raw) {
+                    if (mode === 'phase_only') {
+                        raw = settings.phaseOnly[st.stationId]
+                            || settings.nonRelTargets[st.stationId]
+                            || settings.other.targets;
+                    } else {
+                        raw = settings.nonRelTargets[st.stationId] || settings.other.targets;
+                    }
+                }
+                return normalizeSideTargets(raw);
+            }
+
+            function getNonRelTargets(st) {
+                return getPhaseTargets(st, selectedPhase);
+            }
+
+            function normalizeRelOnlyEntry(raw) {
+                if (raw && raw.weekly === undefined && raw.enabled === undefined
+                    && (Number(raw.M) >= 100 || Number(raw.E) >= 100)) {
+                    return { ...DEFAULT_REL_ONLY };
+                }
+                const side = normalizeSideTargets(raw || DEFAULT_REL_ONLY);
+                const enabledSince = typeof raw?.enabledSince === 'string' && raw.enabledSince
+                    ? raw.enabledSince
+                    : null;
+                return {
+                    M: side.M || DEFAULT_REL_ONLY.M,
+                    E: side.E || DEFAULT_REL_ONLY.E,
+                    enabled: raw?.enabled === true,
+                    weekly: raw?.weekly !== false,
+                    enabledSince: raw?.enabled === true ? enabledSince : null,
+                };
+            }
+
+            function countWeeksInRange(start, end) {
+                const s = new Date(`${start}T12:00:00`);
+                const e = new Date(`${end}T12:00:00`);
+                if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime()) || e < s) return 1;
+                const days = Math.floor((e - s) / 86400000) + 1;
+                return Math.max(1, Math.ceil(days / 7));
+            }
+
+            function getRelOnlyTargetRange(cfg, dateRange) {
+                const rangeStart = dateRange?.start || todayISO();
+                const rangeEnd = dateRange?.end || rangeStart;
+                if (!cfg?.enabled) {
+                    return { start: rangeStart, end: rangeEnd };
+                }
+                let start = cfg.enabledSince || todayISO();
+                if (start < rangeStart) start = rangeStart;
+                if (start > rangeEnd) start = rangeEnd;
+                return { start, end: rangeEnd };
+            }
+
+            function getRelOnlyConfig(st) {
+                return normalizeRelOnlyEntry(settings.relOnly?.[st.stationId] || DEFAULT_REL_ONLY);
+            }
+
+            function isRelOnlyStationEnabled(st) {
+                if ((st.mode || 'both') !== 'rel_only') return true;
+                return getRelOnlyConfig(st).enabled;
+            }
+
+            function getRelOnlyTargets(st) {
+                const cfg = getRelOnlyConfig(st);
+                const weekly = normalizeSideTargets(cfg);
+                if (!cfg.weekly) return weekly;
+                const { start, end } = getRelOnlyTargetRange(cfg, settings.dateRange);
+                const weeks = countWeeksInRange(start, end);
+                return { M: weekly.M * weeks, E: weekly.E * weeks };
+            }
+
+            function applyRelOnlyEnableDates(prevBySid) {
+                const today = todayISO();
+                Object.keys(settings.relOnly || {}).forEach(sid => {
+                    const prev = normalizeRelOnlyEntry(prevBySid?.[sid]);
+                    const entry = { ...settings.relOnly[sid] };
+                    if (entry.enabled && !prev.enabled) {
+                        entry.enabledSince = today;
+                    } else if (entry.enabled && prev.enabled) {
+                        entry.enabledSince = prev.enabledSince || today;
+                    } else {
+                        entry.enabledSince = null;
+                    }
+                    settings.relOnly[sid] = normalizeRelOnlyEntry(entry);
+                });
+            }
+
+            function relOnlyTargetHint(cfg, dateRange) {
+                if (!cfg.enabled) {
+                    return '启用后从当天起按周累计目标';
+                }
+                const { start, end } = getRelOnlyTargetRange(cfg, dateRange);
+                const weeks = countWeeksInRange(start, end);
+                return `自 ${start} 起 ${weeks} 周 · 合计 M ${cfg.M * weeks} / E ${cfg.E * weeks}`;
+            }
+
+            function readPrbInputsFromForm() {
+                return {
+                    M: parseInt(document.getElementById('prbM').value, 10) || 0,
+                    E: parseInt(document.getElementById('prbE').value, 10) || 0,
+                };
+            }
+
+            function readCustomStationTargets(prefix) {
+                const out = {};
+                document.querySelectorAll(`[data-custom-prefix="${prefix}"]`).forEach(row => {
+                    const sid = row.dataset.stationId;
+                    const entry = {
+                        M: parseInt(row.querySelector('[data-v="M"]')?.value, 10) || 0,
+                        E: parseInt(row.querySelector('[data-v="E"]')?.value, 10) || 0,
+                    };
+                    if (prefix === 'rel') {
+                        entry.enabled = !!row.querySelector('[data-v="enabled"]')?.checked;
+                        entry.weekly = true;
+                    }
+                    out[sid] = entry;
+                });
+                return out;
+            }
+
+            function renderCustomStationSettings() {
+                const phaseBox = document.getElementById('phaseOnlySettings');
+                const relBox = document.getElementById('relOnlySettings');
+                if (!phaseBox || !relBox) return;
+                const mk = (meta, prefix, store) => {
+                    const t = normalizeSideTargets(store[meta.id] || DEFAULT_OTHER.targets);
+                    return `
+                        <div class="custom-station-row" data-custom-prefix="${prefix}" data-station-id="${meta.id}">
+                            <h5>${meta.name}</h5>
+                            <div class="variant-inputs">
+                                <div class="field"><label>M</label><input type="number" min="0" data-v="M" value="${t.M}"></div>
+                                <div class="field"><label>E</label><input type="number" min="0" data-v="E" value="${t.E}"></div>
+                            </div>
+                        </div>`;
+                };
+                phaseBox.innerHTML = getStationRegistry()
+                    .filter(m => m.mode === 'phase_only')
+                    .map(m => mk(m, 'phase', settings.phaseOnly || {})).join('');
+                const mkRel = (meta, store) => {
+                    const t = normalizeRelOnlyEntry(store[meta.id] || DEFAULT_REL_ONLY);
+                    const hint = relOnlyTargetHint(t, settings.dateRange);
+                    return `
+                        <div class="custom-station-row rel-only-row${t.enabled ? '' : ' is-disabled'}" data-custom-prefix="rel" data-station-id="${meta.id}">
+                            <div class="rel-only-head">
+                                <h5>${meta.name}</h5>
+                                <label class="rel-only-toggle">
+                                    <input type="checkbox" data-v="enabled" ${t.enabled ? 'checked' : ''} style="width:auto;">
+                                    启用
+                                </label>
+                            </div>
+                            <div class="variant-inputs">
+                                <div class="field"><label>每周 M</label><input type="number" min="0" data-v="M" value="${t.M}"></div>
+                                <div class="field"><label>每周 E</label><input type="number" min="0" data-v="E" value="${t.E}"></div>
+                            </div>
+                            <span class="field-hint">${hint}</span>
+                        </div>`;
+                };
+                relBox.innerHTML = getStationRegistry()
+                    .filter(m => m.mode === 'rel_only')
+                    .map(m => mkRel(m, settings.relOnly || {})).join('');
+            }
+
+            async function updateIncrementalStatus() {
+                const el = document.getElementById('incrementalStatus');
+                if (!el) return;
+                let info = dataPackage?.archiveSummary || {};
+                try {
+                    const res = await fetch(`${API_BASE}/api/archive`, { cache: 'no-store' });
+                    if (res.ok) info = await res.json();
+                } catch (e) { /* offline */ }
+                if (!settings.incremental) settings.incremental = { enabled: false, frozenThrough: null, fetchDays: 7 };
+                if (info.frozenThrough) settings.incremental.frozenThrough = info.frozenThrough;
+                const fetchR = resolveFetchRange(settings);
+                const records = info.records != null ? Number(info.records).toLocaleString() : '—';
+                const previewDay = dataPackage?.previewDay;
+                if (settings.incremental.enabled && settings.incremental.frozenThrough) {
+                    const nextDay = nextIncrementalDay(settings.incremental);
+                    const today = todayISO();
+                    const when = nextDay ? `${nextDay} ${ARCHIVE_TIME}` : ARCHIVE_TIME;
+                    const previewHint = previewDay
+                        ? ` · 已预览 <b>${previewDay}</b>（未归档）`
+                        : '';
+                    el.innerHTML = `已归档至 <b>${settings.incremental.frozenThrough}</b>（${records} 条）${previewHint} · 下次将于 <b>${when}</b> 拉取并归档 <b>${fetchR.start}</b>`;
+                } else if (info.frozenThrough) {
+                    el.innerHTML = `已有归档至 <b>${info.frozenThrough}</b>（${records} 条），勾选上方启用后生效 · 全量范围 <b>${settings.dateRange.start} ~ ${settings.dateRange.end}</b>`;
+                } else {
+                    el.innerHTML = `尚未归档 · 立即刷新将全量拉取 <b>${settings.dateRange.start} ~ ${settings.dateRange.end}</b>`;
+                }
+            }
+
+            function fillForm() {
+                applyUnifiedDates(settings);
+                document.getElementById('dateStart').value = settings.dateRange.start;
+                document.getElementById('dateEnd').value = settings.dateRange.end;
+                document.getElementById('relDailyTarget').value = settings.rel.dailyTarget;
+                selectedPhase = settings.selectedPhase || settings.other?.selectedPhase || DEFAULT_PHASE;
+                document.getElementById('selectedPhase').value = selectedPhase;
+                document.getElementById('otherLabel').value = settings.other.label;
+                const refresh = normalizeRefreshSettings(settings.refresh);
+                settings.refresh = refresh;
+                document.getElementById('refreshIntervalMinutes').value = refresh.intervalMinutes;
+                document.getElementById('slideDwellSeconds').value = refresh.slideDwellSeconds;
+                if (!settings.incremental) settings.incremental = { enabled: false, frozenThrough: null, fetchDays: 7 };
+                document.getElementById('incrementalEnabled').checked = !!settings.incremental.enabled;
+                document.getElementById('incrementalFetchDays').value = settings.incremental.fetchDays ?? 7;
+                if (!settings.counting) settings.counting = { dedupeBySn: true };
+                document.getElementById('dedupeBySn').checked = settings.counting.dedupeBySn !== false;
+                updateIncrementalStatus();
+                document.getElementById('otherSectionTitle').textContent = settings.other.label || '非 REL 阶段';
+                const t = normalizeSideTargets(settings.other.targets);
+                document.getElementById('prbM').value = t.M;
+                document.getElementById('prbE').value = t.E;
+                if (!settings.phaseOnly) settings.phaseOnly = {};
+                if (!settings.relOnly) settings.relOnly = {};
+                renderCustomStationSettings();
+            }
+
+            function readForm() {
+                const start = document.getElementById('dateStart').value;
+                const end = document.getElementById('dateEnd').value;
+                settings.dateRange = { start, end };
+                settings.rel = {
+                    dailyTarget: parseInt(document.getElementById('relDailyTarget').value, 10) || 0,
+                    dateStart: start,
+                    dateEnd: end,
+                };
+                selectedPhase = document.getElementById('selectedPhase').value || DEFAULT_PHASE;
+                settings.selectedPhase = selectedPhase;
+                settings.other = {
+                    label: selectedPhase,
+                    selectedPhase,
+                    dateStart: start,
+                    dateEnd: end,
+                    targets: readPrbInputsFromForm(),
+                };
+                settings.refresh = {
+                    intervalMinutes: Math.max(
+                        1,
+                        parseInt(document.getElementById('refreshIntervalMinutes').value, 10) || 60
+                    ),
+                    slideDwellSeconds: Math.max(
+                        5,
+                        parseInt(document.getElementById('slideDwellSeconds').value, 10) || 30
+                    ),
+                };
+                settings.incremental = {
+                    enabled: document.getElementById('incrementalEnabled').checked,
+                    frozenThrough: settings.incremental?.frozenThrough || null,
+                    fetchDays: Math.max(1, parseInt(document.getElementById('incrementalFetchDays').value, 10) || 7),
+                };
+                settings.counting = {
+                    dedupeBySn: document.getElementById('dedupeBySn').checked,
+                };
+                settings.phaseOnly = readCustomStationTargets('phase');
+                const prevRelOnly = JSON.parse(JSON.stringify(settings.relOnly || {}));
+                settings.relOnly = readCustomStationTargets('rel');
+                applyRelOnlyEnableDates(prevRelOnly);
+                getStationRegistry().forEach(meta => {
+                    if (meta.mode === 'phase_only' && settings.phaseOnly[meta.id]) {
+                        settings.nonRelTargets[meta.id] = { ...settings.phaseOnly[meta.id] };
+                    }
+                });
+                applyOtherTargetsObject(settings.other.targets);
+                applyUnifiedDates(settings);
+            }
+
+            function parseTimestamp(value) {
+                if (!value) return 0;
+                const normalized = String(value).trim().replace(' ', 'T');
+                const ts = Date.parse(normalized);
+                return Number.isNaN(ts) ? 0 : ts;
+            }
+
+            function resolveLatestUpdateTime() {
+                const candidates = [
+                    dataPackage?.generatedAt,
+                    dataPackage?.archiveSummary?.archivedAt,
+                    lastKnownRefresh,
+                ].filter(Boolean);
+                if (!candidates.length) return '—';
+                return candidates.reduce((latest, current) => (
+                    parseTimestamp(current) >= parseTimestamp(latest) ? current : latest
+                ));
+            }
+
+            function updateSyncTimeDisplay() {
+                const el = document.getElementById('syncTime');
+                if (!el) return;
+                el.innerText = `Updated ${resolveLatestUpdateTime()}`;
+            }
+
+            function showSettingsHint(msg, ok) {
+                const el = document.getElementById('settingsHint');
+                if (!el) return;
+                el.textContent = msg;
+                el.style.color = ok ? 'var(--success)' : 'var(--non-rel-color)';
+            }
+
+            function renderPhaseSwitcher() {
+                const sel = document.getElementById('phaseSelect');
+                if (!sel) return;
+                const types = getPhaseTypes();
+                sel.innerHTML = types.map(phase => {
+                    const has = dataPackage && phaseHasData(phase);
+                    const label = has ? phase : `${phase} (no data)`;
+                    return `<option value="${phase}">${label}</option>`;
+                }).join('');
+                sel.value = selectedPhase;
+                if (!types.includes(sel.value)) {
+                    sel.value = types[0] || DEFAULT_PHASE;
+                    selectedPhase = sel.value;
+                }
+            }
+
+            function onPhaseSelectChange() {
+                const sel = document.getElementById('phaseSelect');
+                if (!sel) return;
+                selectedPhase = sel.value || DEFAULT_PHASE;
+                settings.selectedPhase = selectedPhase;
+                if (settings.other) {
+                    settings.other.selectedPhase = selectedPhase;
+                    settings.other.label = selectedPhase;
+                }
+                saveSettings();
+                renderDashboard();
+            }
+
+            function renderDashboard() {
+                if (!dataPackage || !orderedStations(dataPackage).length) {
+                    const msg = '<div class="empty-placeholder" style="padding:40px;text-align:center;">No station data. Add exports/*.xlsx and refresh.</div>';
+                    ['rel-table-left', 'rel-table-right', 'nonrel-table-left', 'nonrel-table-right'].forEach(id => {
+                        document.getElementById(id).innerHTML = msg;
+                    });
+                    updateSyncTimeDisplay();
+                    return;
+                }
+
+                const stations = orderedStations(dataPackage);
+                const relTargets = computeRelTargetsFromCheckin(
+                    settings.dateRange.start,
+                    settings.dateRange.end
+                );
+                selectedPhase = settings.selectedPhase || settings.other?.selectedPhase || DEFAULT_PHASE;
+                const phaseLabel = selectedPhase;
+                const leftData = stations.slice(0, 9);
+                const rightData = stations.slice(9, 18);
+
+                renderPhaseSwitcher();
+                const nonRelTitle = document.getElementById('nonRelPageTitle');
+                if (nonRelTitle) {
+                    nonRelTitle.textContent = `✦ ${phaseLabel} Testing ✦`;
+                }
+
+            const renderProgress = (pass, target, fillClass) => {
+                if (target <= 0) {
+                    return pass > 0
+                        ? `<div class="progress-wrapper"><div class="empty-placeholder num-font">${pass} / —</div></div>`
+                        : emptyCell;
+                }
+                const pct = Math.min(100, Math.round((pass / target) * 100));
+                const wrapperCls = fillClass === 'fill-rel' ? 'progress-wrapper-rel' : 'progress-wrapper-nonrel';
+                return `
+                    <div class="progress-wrapper ${wrapperCls}">
+                        <div class="progress-stats-row">
+                            <span class="progress-stat progress-stat-count num-font">${pass}<span class="stat-sep">/</span>${target}</span>
+                            <span class="progress-stat progress-stat-pct num-font">${pct}%</span>
+                        </div>
+                        <div class="progress-capsule">
+                            <div class="progress-fill ${fillClass}${pct > 0 ? ' progress-fill-live' : ''}" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            };
+
+            const renderYield = (pass, fail) => {
+                const total = pass + fail;
+                if (total === 0) return emptyCell;
+                const rate = ((pass / total) * 100).toFixed(1);
+                const cls = rate >= 98.0 ? 'yield-status-good' : 'yield-status-bad';
+                return `<div class="yield-wrap"><div class="yield-value num-font ${cls}">${rate}%</div></div>`;
+            };
+
+            const buildTable = (dataSubset, phaseType) => {
+                const isRel = phaseType === 'REL';
+                const badgeCls = isRel ? 'badge-rel' : 'badge-nonrel';
+                const fillCls = isRel ? 'fill-rel' : 'fill-nonrel';
+                const yieldLabel = isRel ? 'REL' : phaseLabel;
+
+                let html = `
+                    <table class="dashboard-matrix">
+                        <thead>
+                            <tr>
+                                <th class="col-station-head" style="width: 30%; text-align: center;">Station</th>
+                                <th><span class="sku-title-badge ${badgeCls}">M03-M-SKU</span></th>
+                                <th class="col-sku-e"><span class="sku-title-badge ${badgeCls}">M03-E-SKU</span></th>
+                                <th class="col-yield-head" style="width: 16%; text-align: center;">${yieldLabel} Yield</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                dataSubset.forEach(st => {
+                    const mode = st.mode || 'both';
+                    let mCell = emptyCell;
+                    let eCell = emptyCell;
+                    let yCell = emptyCell;
+
+                    if (isRel) {
+                        if (mode !== 'phase_only') {
+                            if (mode === 'rel_only' && !isRelOnlyStationEnabled(st)) {
+                                // 未启用：保留 emptyCell（—）
+                            } else {
+                                const m = sumSide(st.rel, REL_M);
+                                const e = sumSide(st.rel, REL_E);
+                                let mTarget;
+                                let eTarget;
+                                if (mode === 'rel_only') {
+                                    const t = getRelOnlyTargets(st);
+                                    mTarget = t.M;
+                                    eTarget = t.E;
+                                } else {
+                                    mTarget = relTargets.M;
+                                    eTarget = relTargets.E;
+                                }
+                                mCell = renderProgress(m.pass, mTarget, fillCls);
+                                eCell = renderProgress(e.pass, eTarget, fillCls);
+                                yCell = renderYield(m.pass + e.pass, m.fail + e.fail);
+                            }
+                        }
+                    } else if (mode !== 'rel_only') {
+                        const phaseData = getStationPhaseData(st, selectedPhase);
+                        const m = sumSide(phaseData, REL_M);
+                        const e = sumSide(phaseData, REL_E);
+                        const t = getPhaseTargets(st, selectedPhase);
+                        mCell = renderProgress(m.pass, t.M, fillCls);
+                        eCell = renderProgress(e.pass, t.E, fillCls);
+                        yCell = renderYield(m.pass + e.pass, m.fail + e.fail);
+                    }
+
+                    html += `
+                        <tr>
+                            <td class="col-station-name" title="${st.stationId}">${st.name}</td>
+                            <td>${mCell}</td>
+                            <td class="col-sku-e">${eCell}</td>
+                            <td class="col-yield-cell">${yCell}</td>
+                        </tr>
+                    `;
+                });
+                return html + `</tbody></table>`;
+            };
+
+                document.getElementById('rel-table-left').innerHTML = buildTable(leftData, 'REL');
+                document.getElementById('rel-table-right').innerHTML = buildTable(rightData, 'REL');
+                document.getElementById('nonrel-table-left').innerHTML = buildTable(leftData, 'NON-REL');
+                document.getElementById('nonrel-table-right').innerHTML = buildTable(rightData, 'NON-REL');
+                updateSyncTimeDisplay();
+                syncSlideClone?.();
+            }
+
+            async function applySettings() {
+                try {
+                    readForm();
+                    saveSettings();
+                    renderDashboard();
+                    const ts = normalizeSideTargets(settings.other.targets);
+                    const fetchR = resolveFetchRange(settings);
+                    const incHint = settings.incremental?.enabled && settings.incremental?.frozenThrough
+                        ? ` · 增量下一天 ${fetchR.start}`
+                        : '';
+                    const interval = normalizeRefreshSettings(settings.refresh).intervalMinutes;
+                    const dwell = normalizeRefreshSettings(settings.refresh).slideDwellSeconds;
+                    let hint = `✓ 已应用：统计 ${settings.dateRange.start}~${settings.dateRange.end}${incHint} · REL M/E 各 ${settings.rel.dailyTarget}/天 · ${settings.other.label} M${ts.M}/E${ts.E} · 归档 ${ARCHIVE_TIME} · 刷新 ${interval}分钟 · 轮播 ${dwell}s`;
+                    try {
+                        await pushServerConfig();
+                    } catch (e) {
+                        hint += '（未连接本地服务，仅本页生效）';
+                    }
+                    showSettingsHint(hint, true);
+                    restartSlideShow?.();
+                    scheduleStatusPoll?.();
+                } catch (err) {
+                    showSettingsHint('应用失败: ' + err.message, false);
+                }
+            }
+
+            async function refreshNow() {
+                const btn = document.getElementById('btnRefreshNow');
+                const origText = btn ? btn.textContent : '';
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = '刷新中…';
+                }
+                showSettingsHint('正在连接后台服务…', true);
+                try {
+                    const status = await triggerServerRefresh((msg) => showSettingsHint(msg, true));
+                    if (status?.preview) {
+                        showSettingsHint(
+                            status.message || `✓ 增量预览 ${status.previewDay} 已更新（未归档）`,
+                            true
+                        );
+                    } else if (status?.skipped) {
+                        showSettingsHint(status.message || `未到 ${ARCHIVE_TIME}，未归档`, true);
+                    } else {
+                        showSettingsHint('✓ 数据已刷新，正在更新看板…', true);
+                    }
+                    if (!status?.skipped) {
+                        try {
+                            await softReloadDashboard(status?.lastRun);
+                            if (!status?.preview) {
+                                showSettingsHint('✓ 看板数据已更新', true);
+                            }
+                        } catch (reloadErr) {
+                            showSettingsHint('数据已刷新但热更新失败，将重载页面…', true);
+                            setTimeout(() => location.reload(), 800);
+                        }
+                    }
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = origText;
+                    }
+                } catch (err) {
+                    showSettingsHint('刷新失败: ' + err.message, false);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = origText;
+                    }
+                }
+            }
+
+            function resetSettings() {
+                localStorage.removeItem(LS_KEY);
+                settings = defaultSettings();
+                fillForm();
+                saveSettings();
+                renderDashboard();
+                showSettingsHint('✓ 已恢复默认设置', true);
+            }
+
+            const API_BASE = resolveApiBase();
+            dataPackage = parseDataPackage();
+            if (dataPackage?.generatedAt) {
+                lastKnownRefresh = dataPackage.generatedAt;
+            }
+            await loadSettings();
+            renderDashboard();
+
+            // ==========================================
+            // 单向滑动轮播（始终向左切换）
+            // ==========================================
+            let autoPlayInterval;
+            let isPaused = false;
+            let trackIndex = 0;
+            let wrapResetTimer = null;
+            const SLIDE_COUNT = 3;
+            const SLIDE_STEP = 100 / SLIDE_COUNT;
+            
+            const track = document.getElementById('sliderTrack');
+            const dotRel = document.getElementById('dot-rel');
+            const dotNonRel = document.getElementById('dot-nonrel');
+            const btnPause = document.getElementById('btnPausePlay');
+            const viewport = document.getElementById('swipeViewport');
+
+            const relSlide = track.querySelector('.slide-page.slide-rel');
+            const cloneSlide = relSlide.cloneNode(true);
+            cloneSlide.classList.add('slide-page-clone');
+            cloneSlide.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+            track.appendChild(cloneSlide);
+
+            syncSlideClone = () => {
+                const source = track.querySelector('.slide-page.slide-rel:not(.slide-page-clone)');
+                const clone = track.querySelector('.slide-page-clone');
+                if (!source || !clone) return;
+                clone.innerHTML = source.innerHTML;
+                clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+                clone.className = 'slide-page slide-rel slide-page-clone';
+            };
+            syncSlideClone();
+
+            const getSlideDurationMs = () => {
+                const raw = getComputedStyle(document.documentElement).getPropertyValue('--slide-duration').trim();
+                return raw.endsWith('s') ? parseFloat(raw) * 1000 : 1400;
+            };
+
+            const getLogicalSlide = () => trackIndex % 2;
+
+            const updateDots = () => {
+                const logical = getLogicalSlide();
+                if (logical === 0) {
+                    dotRel.classList.add('active');
+                    dotNonRel.classList.remove('active');
+                } else {
+                    dotNonRel.classList.add('active');
+                    dotRel.classList.remove('active');
+                }
+            };
+
+            const setTrackPosition = (animate = true) => {
+                if (animate) {
+                    track.style.transition = 'transform var(--slide-duration) cubic-bezier(0.4, 0, 0.2, 1)';
+                } else {
+                    track.style.transition = 'none';
+                }
+                track.style.transform = `translateX(-${trackIndex * SLIDE_STEP}%)`;
+                updateDots();
+            };
+
+            const resetToStart = () => {
+                clearTimeout(wrapResetTimer);
+                track.style.transition = 'none';
+                trackIndex = 0;
+                track.style.transform = 'translateX(0%)';
+                updateDots();
+            };
+
+            const scheduleWrapReset = () => {
+                clearTimeout(wrapResetTimer);
+                const onWrapEnd = (e) => {
+                    if (e.target !== track || e.propertyName !== 'transform') return;
+                    track.removeEventListener('transitionend', onWrapEnd);
+                    clearTimeout(wrapResetTimer);
+                    resetToStart();
+                };
+                track.addEventListener('transitionend', onWrapEnd);
+                wrapResetTimer = setTimeout(() => {
+                    track.removeEventListener('transitionend', onWrapEnd);
+                    resetToStart();
+                }, getSlideDurationMs() + 80);
+            };
+
+            const advanceSlideForward = () => {
+                if (trackIndex >= 2) return;
+                trackIndex += 1;
+                setTrackPosition(true);
+                if (trackIndex === 2) scheduleWrapReset();
+            };
+
+            const goToLogicalSlide = (targetLogical) => {
+                if (getLogicalSlide() === targetLogical) return;
+                advanceSlideForward();
+            };
+
+            const startAutoPlay = () => { 
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = setInterval(advanceSlideForward, getSlideDwellMs()); 
+            };
+            const stopAutoPlay = () => clearInterval(autoPlayInterval);
+            const resetAutoPlay = () => { if (!isPaused) startAutoPlay(); };
+
+            btnPause.addEventListener('click', () => {
+                isPaused = !isPaused;
+                if (isPaused) {
+                    stopAutoPlay();
+                    btnPause.textContent = '▶';
+                    btnPause.setAttribute('aria-label', 'Resume slideshow');
+                    btnPause.title = 'Resume slideshow';
+                    btnPause.style.color = 'var(--non-rel-color)';
+                } else {
+                    startAutoPlay();
+                    btnPause.textContent = '⏸';
+                    btnPause.setAttribute('aria-label', 'Pause slideshow');
+                    btnPause.title = 'Pause slideshow';
+                    btnPause.style.color = 'var(--text-main)';
+                }
+            });
+
+            dotRel.addEventListener('click', () => { goToLogicalSlide(0); resetAutoPlay(); });
+            dotNonRel.addEventListener('click', () => { goToLogicalSlide(1); resetAutoPlay(); });
+
+            // --- 核心滑动逻辑 ---
+            let startX = 0;
+            let currentX = 0;
+            let dragOffset = 0;
+            let isDragging = false;
+
+            const handleDragStart = (e) => {
+                if (e.target.closest('.controls') || e.target.closest('.dots-container') ||
+                    e.target.closest('.modal-overlay') || e.target.closest('.modal')) return;
+                startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+                isDragging = true;
+                stopAutoPlay(); 
+                
+                // 拖拽时取消动画过渡，实现绝对跟手
+                track.style.transition = 'none'; 
+            };
+
+            const handleDragMove = (e) => {
+                if (!isDragging) return;
+                currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+                dragOffset = currentX - startX;
+
+                // 禁止向右回滑，仅允许向左前进
+                if (dragOffset > 0) {
+                    dragOffset = dragOffset * 0.25;
+                }
+
+                const basePct = -(trackIndex * SLIDE_STEP);
+                track.style.transform = `translateX(calc(${basePct}% + ${dragOffset}px))`;
+            };
+
+            const handleDragEnd = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                
+                const threshold = Math.min(window.innerWidth * 0.1, 100); 
+
+                if (dragOffset < -threshold) {
+                    advanceSlideForward();
+                } else {
+                    setTrackPosition(true);
+                }
+                dragOffset = 0; 
+                resetAutoPlay(); 
+            };
+
+            viewport.addEventListener('touchstart', handleDragStart, { passive: true });
+            viewport.addEventListener('touchmove', handleDragMove, { passive: true });
+            viewport.addEventListener('touchend', handleDragEnd);
+
+            viewport.addEventListener('mousedown', handleDragStart);
+            viewport.addEventListener('mousemove', handleDragMove);
+            viewport.addEventListener('mouseup', handleDragEnd);
+            viewport.addEventListener('mouseleave', handleDragEnd); 
+
+            startAutoPlay();
+            restartSlideShow = () => { if (!isPaused) startAutoPlay(); };
+
+            const pollRefreshStatus = async () => {
+                try {
+                    const res = await fetch(`${API_BASE}/api/status`, { cache: 'no-store' });
+                    if (!res.ok) return;
+                    const st = await res.json();
+                    if (st.lastRun && lastKnownRefresh && st.lastRun !== lastKnownRefresh && st.ok && !st.running) {
+                        try {
+                            await softReloadDashboard(st.lastRun);
+                        } catch (e) {
+                            lastKnownRefresh = st.lastRun;
+                            updateSyncTimeDisplay();
+                            flashSyncTime();
+                        }
+                        return;
+                    }
+                    if (st.lastRun && !lastKnownRefresh) {
+                        lastKnownRefresh = st.lastRun;
+                    }
+                    updateSyncTimeDisplay();
+                } catch (e) { /* offline */ }
+            };
+            let statusPollTimer = null;
+            const scheduleStatusPoll = () => {
+                if (statusPollTimer) clearInterval(statusPollTimer);
+                statusPollTimer = setInterval(pollRefreshStatus, getStatusPollMs());
+            };
+            pollRefreshStatus();
+            scheduleStatusPoll();
+
+            document.getElementById('btnFullscreen').addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => console.error(err));
+                } else {
+                    document.exitFullscreen();
+                }
+            });
+
+            const settingsModal = document.getElementById('settingsModal');
+            const openSettings = () => {
+                fillForm();
+                settingsModal.classList.add('open');
+                settingsModal.setAttribute('aria-hidden', 'false');
+            };
+            const closeSettings = () => {
+                settingsModal.classList.remove('open');
+                settingsModal.setAttribute('aria-hidden', 'true');
+            };
+
+            document.getElementById('btnToggleSettings').addEventListener('click', openSettings);
+            document.getElementById('btnCloseSettings').addEventListener('click', closeSettings);
+            document.getElementById('btnApply').addEventListener('click', () => { applySettings(); });
+            document.getElementById('btnRefreshNow').addEventListener('click', () => { refreshNow(); });
+            document.getElementById('btnReset').addEventListener('click', () => { resetSettings(); });
+            settingsModal.addEventListener('click', (e) => {
+                if (e.target === settingsModal) closeSettings();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeSettings();
+            });
+            document.getElementById('selectedPhase').addEventListener('change', () => {
+                selectedPhase = document.getElementById('selectedPhase').value || DEFAULT_PHASE;
+                const phaseSel = document.getElementById('phaseSelect');
+                if (phaseSel) phaseSel.value = selectedPhase;
+            });
+            document.getElementById('phaseSelect').addEventListener('change', onPhaseSelectChange);
+            document.getElementById('otherLabel').addEventListener('input', () => {
+                const name = document.getElementById('otherLabel').value.trim() || selectedPhase;
+                document.getElementById('otherSectionTitle').textContent = name;
+            });
+            document.getElementById('incrementalEnabled').addEventListener('change', updateIncrementalStatus);
+            document.getElementById('incrementalFetchDays').addEventListener('input', updateIncrementalStatus);
+            document.getElementById('dateStart').addEventListener('change', updateIncrementalStatus);
+            document.getElementById('dateEnd').addEventListener('change', updateIncrementalStatus);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "frozenThrough": "2026-06-04",
+  "archivedAt": "2026-06-05 10:37:45",
+  "mode": "freeze",
+  "stations": {
+    "M03-EQT-CHECK-IN": 2124,
+    "M03-EQT-Charge-Discharge": 3,
+    "M03-EQT-Constant Temp Room": 42,
+    "M03-EQT-Beach": 28,
+    "M03-EQT-Other": 59,
+    "M03-CQA-Humdity test": 533,
+    "M03-EQT-Basketball-Football": 2109,
+    "M03-EQT-Coffee-Convenience Store": 2101,
+    "M03-EQT-Commute": 2103,
+    "M03-EQT-Gym": 2108,
+    "M03-EQT-Home": 2106,
+    "M03-EQT-Office": 2104,
+    "M03-EQT-Quiet Room": 2102,
+    "M03-EQT-Running Track": 2109,
+    "M03-EQT-Stairs": 2107,
+    "M03-EQT-Noise Room": 2105,
+    "M03-EQT-Test": 2055,
+    "M03-EQT-CHECK-OUT": 2052
+  },
+  "lastMergeAt": "2026-06-05 15:12:24",
+  "lastMergeCounts": {
+    "M03-EQT-CHECK-IN": 58,
+    "M03-EQT-Basketball-Football": 58,
+    "M03-EQT-Coffee-Convenience Store": 52,
+    "M03-EQT-Commute": 54,
+    "M03-EQT-Gym": 58,
+    "M03-EQT-Home": 56,
+    "M03-EQT-Office": 58,
+    "M03-EQT-Quiet Room": 56,
+    "M03-EQT-Running Track": 54,
+    "M03-EQT-Stairs": 52,
+    "M03-EQT-Noise Room": 54,
+    "M03-EQT-Test": 42,
+    "M03-EQT-CHECK-OUT": 42,
+    "M03-CQA-Humdity test": 42
+  },
+  "lastBackfillAt": "2026-06-05 15:21:03",
+  "lastBackfillCounts": {
+    "M03-CQA-Humdity test": 533
+  },
+  "lastAuditFixAt": "2026-06-05 15:57:15",
+  "lastAuditFixCounts": {
+    "M03-EQT-Basketball-Football": 2109,
+    "M03-EQT-Coffee-Convenience Store": 2101,
+    "M03-EQT-Commute": 2103,
+    "M03-EQT-Gym": 2108,
+    "M03-EQT-Home": 2106,
+    "M03-EQT-Office": 2104,
+    "M03-EQT-Quiet Room": 2102,
+    "M03-EQT-Running Track": 2109,
+    "M03-EQT-Stairs": 2107,
+    "M03-EQT-Noise Room": 2105,
+    "M03-EQT-Test": 2055,
+    "M03-EQT-CHECK-OUT": 2052
+  }
+}
