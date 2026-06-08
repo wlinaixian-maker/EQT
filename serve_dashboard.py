@@ -109,11 +109,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
 
+def _incremental_enabled():
+    return bool(load_config().get('incremental', {}).get('enabled'))
+
+
 def _run_refresh_job(*, mode='preview'):
     global _refresh_thread
     try:
         from hourly_refresh import refresh_once, refresh_preview
-        if mode == 'archive':
+        if mode == 'archive' or not _incremental_enabled():
             refresh_once(force=False)
             return
         result = refresh_preview()
@@ -140,8 +144,9 @@ def start_refresh_async(*, mode='preview'):
             target=_run_refresh_job, kwargs={'mode': mode}, daemon=True
         )
         _refresh_thread.start()
-    if mode == 'archive':
-        msg = '归档刷新已开始，请稍候…'
+    if mode == 'archive' or not _incremental_enabled():
+        msg = '全量拉取并归档已开始，请稍候…'
+        mode = 'archive'
     else:
         msg = '增量预览刷新已开始，请稍候…'
     return {'success': True, 'started': True, 'running': True, 'message': msg, 'mode': mode}
@@ -172,6 +177,11 @@ def archive_worker():
                 if sleep_sec <= 0:
                     break
                 time.sleep(min(sleep_sec, 30))
+
+            cfg = load_config()
+            if not cfg.get('incremental', {}).get('enabled'):
+                last_announced = None
+                continue
 
             with _refresh_lock:
                 busy = _refresh_thread and _refresh_thread.is_alive()
@@ -205,9 +215,10 @@ def interval_refresh_worker():
                 slept += chunk
                 interval_sec = get_refresh_interval_sec()
 
-            start_refresh_async(mode='preview')
+            mode = 'preview' if _incremental_enabled() else 'archive'
+            start_refresh_async(mode=mode)
         except Exception as err:
-            print(f'❌ 定时预览刷新失败: {err}')
+            print(f'❌ 定时刷新失败: {err}')
 
 
 def main():
@@ -229,7 +240,11 @@ def main():
     url = f'http://localhost:{PORT}'
     print(f'✓ 看板服务 {url}')
     print(f'  归档：每天 {format_archive_time()} 自动归档')
-    print(f'  定时刷新：每 {minutes} 分钟增量预览（不归档）')
+    inc_on = cfg.get('incremental', {}).get('enabled')
+    if inc_on:
+        print(f'  定时刷新：每 {minutes} 分钟增量预览（不归档）')
+    else:
+        print(f'  定时刷新：每 {minutes} 分钟全量拉取并归档')
     print('  设置保存后会同步到 dashboard_config.json')
     if getattr(sys, 'frozen', False):
         threading.Timer(1.0, lambda: webbrowser.open(url)).start()

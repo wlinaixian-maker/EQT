@@ -66,7 +66,7 @@ def merge_records(existing, incoming, *, replace=False):
     return dedupe_records_by_sn(base + list(incoming), per_phase=True)
 
 
-def freeze_from_exports(frozen_through=None):
+def freeze_from_exports(frozen_through=None, *, incremental_enabled=None):
     """将当前 exports/*.xlsx 全量写入归档（首次长区间拉取后执行）。"""
     from dashboard_config import load_config, save_config, resolve_date_range
 
@@ -86,7 +86,10 @@ def freeze_from_exports(frozen_through=None):
             counts[station_id] = len(merged)
 
     inc = config.setdefault('incremental', {})
-    inc['enabled'] = True
+    if incremental_enabled is None:
+        inc['enabled'] = True
+    else:
+        inc['enabled'] = bool(incremental_enabled)
     inc['frozenThrough'] = frozen
     inc.setdefault('fetchDays', 7)
     save_config(config)

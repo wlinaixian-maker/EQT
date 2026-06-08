@@ -50,6 +50,7 @@ def delete_processed_exports():
 def refresh_once(*, freeze=False, force=False):
     config = load_config()
     inc = config.get('incremental') or {}
+    inc_enabled = bool(inc.get('enabled'))
 
     # 仅在未启用“增量日更链路”时，才自动把结束日期推进到昨天。
     # 启用后，结束日期应严格跟随“归档最后一天”，由 23:59 日更任务推进。
@@ -105,10 +106,13 @@ def refresh_once(*, freeze=False, force=False):
     # 先归档/合并，再生成看板（确保 index.html 内置数据包含刚归档的那天）。
     write_status(False, '正在归档/合并…', {'running': True})
 
-    if freeze or (not incremental and not config.get('incremental', {}).get('frozenThrough')):
-        archive_info = freeze_from_exports(frozen_through=report_end)
-        print(f'📦 已归档全量数据，冻结至 {archive_info["frozenThrough"]}')
-        archive_msg = f'归档 {sum(archive_info["stations"].values()):,} 条'
+    if freeze or not inc_enabled:
+        archive_info = freeze_from_exports(
+            frozen_through=report_end,
+            incremental_enabled=inc_enabled,
+        )
+        print(f'📦 已全量归档，冻结至 {archive_info["frozenThrough"]}')
+        archive_msg = f'全量归档 {sum(archive_info["stations"].values()):,} 条至 {archive_info["frozenThrough"]}'
     elif incremental:
         merge_incremental_exports(frozen_through=fetch_end)
         print(f'📦 已合并增量数据，更新冻结至 {fetch_end}')

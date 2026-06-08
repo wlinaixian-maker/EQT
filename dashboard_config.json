@@ -1,18 +1,18 @@
 {
   "dateRange": {
     "start": "2026-01-05",
-    "end": "2026-06-04"
+    "end": "2026-06-07"
   },
   "rel": {
     "dailyTarget": 20,
     "dateStart": "2026-01-05",
-    "dateEnd": "2026-06-04"
+    "dateEnd": "2026-06-07"
   },
   "other": {
     "label": "PRB",
     "selectedPhase": "PRB",
     "dateStart": "2026-01-05",
-    "dateEnd": "2026-06-04",
+    "dateEnd": "2026-06-07",
     "targets": {
       "M": 200,
       "E": 200
@@ -28,7 +28,7 @@
   },
   "incremental": {
     "enabled": true,
-    "frozenThrough": "2026-06-04",
+    "frozenThrough": "2026-06-07",
     "fetchDays": 3
   },
   "phaseOnly": {

@@ -2,7 +2,7 @@
   "_comment": "非 REL 工单：各工站各型号一次性固定目标数量（可修改）。未配置时默认=当前实际过站数（显示100%）",
   "dateRange": {
     "start": "2026-01-05",
-    "end": "2026-06-04"
+    "end": "2026-06-07"
   },
   "relDailyTarget": 20,
   "defaultNonRelTarget": null,
@@ -155,6 +155,6 @@
   "_dashboardOther": {
     "label": "PRB",
     "dateStart": "2026-01-05",
-    "dateEnd": "2026-06-04"
+    "dateEnd": "2026-06-07"
   }
 }
